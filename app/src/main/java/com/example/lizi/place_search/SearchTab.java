@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 public class SearchTab extends Fragment {
@@ -38,28 +40,45 @@ public class SearchTab extends Fragment {
     double currentLat;
     double currentLon;
 
+    RadioGroup radioLocationGroup;
+    EditText keywordET;
+    Spinner spinnerCategories;
+    EditText distanceET;
+    EditText addressET;
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.search_tab, container, false);
 
-        Spinner spinnerCategories = (Spinner) view.findViewById(R.id.spinnerCategories);
+        keywordET = (EditText) view.findViewById(R.id.keyword);
+        distanceET = (EditText) view.findViewById(R.id.distance);
+        addressET = (EditText) view.findViewById(R.id.inputAddress);
+        radioLocationGroup = (RadioGroup) view.findViewById(R.id.radioLocation);
+        spinnerCategories = (Spinner) view.findViewById(R.id.spinnerCategories);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity().getApplicationContext(),
                 android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         spinnerCategories.setAdapter(adapter);
 
         getCurrentLocation();
 
-        Button searchBtn = (Button) view.findViewById(R.id.buttonSearch);
-        searchBtn.setOnClickListener(new View.OnClickListener() {
+        radioLocationGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
 
+                if(checkedId == R.id.radioCurrentLocation) {
+                    Log.d("search", "current location clicked");
+                    addressET.setEnabled(false);
+                } else {
+                    Log.d("search", "other location clicked");
+                    addressET.setEnabled(true);
+                }
             }
         });
 
+        addListenerOnSearchButton(view);
 
         return view;
     }
@@ -118,5 +137,26 @@ public class SearchTab extends Fragment {
                 Log.d("search", "onPermissionResult(): Permission denied!");
             }
         }
+    }
+
+
+    private void addListenerOnSearchButton(View view) {
+        Button searchBtn = (Button) view.findViewById(R.id.buttonSearch);
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String keyword = keywordET.getText().toString();
+                Log.d("search", "keyword: " + keyword);
+                String category = String.valueOf(spinnerCategories.getSelectedItem());
+                Log.d("search", "category: " + category);
+                String distance = distanceET.getText().toString();
+                Log.d("search", "distance: " + distance);
+                String address;
+                if(radioLocationGroup.getCheckedRadioButtonId() == R.id.radioOtherLocation) {
+                    address = addressET.getText().toString();
+                    Log.d("search", "address: " + address);
+                }
+            }
+        });
     }
 }

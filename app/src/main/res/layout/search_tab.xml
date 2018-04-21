@@ -16,7 +16,7 @@
         android:text="@string/keywordInputLabel" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/keyword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -65,14 +65,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/radio_currLoc" />
+            android:text="@string/radio_currLoc"
+            android:checked="true"/>
 
         <RadioButton
             android:id="@+id/radioOtherLocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/radio_other" />
+            android:text="@string/radio_other"/>
     </RadioGroup>
 
     <EditText
@@ -82,8 +83,8 @@
         android:layout_marginLeft="28dp"
         android:ems="10"
         android:hint="@string/prompt_address"
-        android:inputType="text"
-        android:layout_marginStart="28dp" />
+        android:layout_marginStart="28dp"
+        android:enabled="false"/>
 
     <LinearLayout
         android:layout_width="match_parent"
