@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Places Search</string>
+    <string name="tab_text_1">Search</string>
+    <string name="tab_text_2">Favorites</string>
+    <string name="keywordInputLabel">Keyword</string>
+    <string name="prompt_keyword">Enter keyword</string>
+    <string name="categoryInputLabel">Category</string>
+    <string name="distanceInputLabel">Distance (in miles)</string>
+    <string name="prompt_distance">Enter distance (default 10 miles)</string>
+    <string name="locationInputLabel">From</string>
+    <string name="radio_currLoc">Current Location</string>
+    <string name="radio_other">Other. Specify Location</string>
+    <string name="prompt_address">Type in the Location</string>
+    <string name="button_search">SEARCH</string>
+    <string name="button_clear">CLEAR</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+</resources>
