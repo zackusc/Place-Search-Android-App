@@ -1,7 +1,9 @@
 package com.example.lizi.place_search;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -18,11 +20,22 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
+
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 public class SearchTab extends Fragment {
     final int REQUEST_CODE = 123;
+    final String RESULTS_URL = "http://place-search-lizi0829.us-east-2.elasticbeanstalk.com/results";
 
     String[] categories = new String[]{
             "Default", "Airport", "Amusement Park", "Aquarium",
@@ -63,21 +76,7 @@ public class SearchTab extends Fragment {
         spinnerCategories.setAdapter(adapter);
 
         getCurrentLocation();
-
-        radioLocationGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-
-                if(checkedId == R.id.radioCurrentLocation) {
-                    Log.d("search", "current location clicked");
-                    addressET.setEnabled(false);
-                } else {
-                    Log.d("search", "other location clicked");
-                    addressET.setEnabled(true);
-                }
-            }
-        });
-
+        addListenerOnRadioButtons();
         addListenerOnSearchButton(view);
 
         return view;
@@ -150,13 +149,74 @@ public class SearchTab extends Fragment {
                 String category = String.valueOf(spinnerCategories.getSelectedItem());
                 Log.d("search", "category: " + category);
                 String distance = distanceET.getText().toString();
+                distance = distance.isEmpty() ? "10" : distance;
                 Log.d("search", "distance: " + distance);
+
+
+                RequestParams params = new RequestParams();
+                params.put("keyword", keyword);
+                params.put("distance", distance);
+                params.put("category", category);
+
                 String address;
                 if(radioLocationGroup.getCheckedRadioButtonId() == R.id.radioOtherLocation) {
                     address = addressET.getText().toString();
                     Log.d("search", "address: " + address);
+                    params.put("address", address);
+                } else {
+                    params.put("lat", currentLat);
+                    params.put("lng", currentLon);
+                }
+//                Log.d("search", "params: " + params.toString());
+                getResultsAndSwitchView(params);
+
+            }
+        });
+    }
+
+    private void addListenerOnRadioButtons() {
+        radioLocationGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                if(checkedId == R.id.radioCurrentLocation) {
+                    Log.d("search", "current location clicked");
+                    addressET.setEnabled(false);
+                } else {
+                    Log.d("search", "other location clicked");
+                    addressET.setEnabled(true);
                 }
             }
         });
+    }
+
+    private void getResultsAndSwitchView(RequestParams params) {
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Fetching results");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(RESULTS_URL, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("Search", "Success! JSON: " + response.toString());
+                progressDialog.dismiss();
+                String resultsJSON = response.toString();
+                Intent myIntent = new Intent(getActivity(), SearchResultsActivity.class);
+                myIntent.putExtra("resultsJSON", resultsJSON);
+                startActivity(myIntent);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                Log.d("search", "Fail " + e.toString());
+                Log.d("search", "Status code " + statusCode);
+            }
+        });
+
+
     }
 }
