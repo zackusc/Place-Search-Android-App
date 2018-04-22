@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Places Search</string>
-    <string name="tab_text_1">Search</string>
-    <string name="tab_text_2">Favorites</string>
+    <string name="main_tab_text_1">Search</string>
+    <string name="main_tab_text_2">Favorites</string>
     <string name="keywordInputLabel">Keyword</string>
     <string name="prompt_keyword">Enter keyword</string>
     <string name="categoryInputLabel">Category</string>

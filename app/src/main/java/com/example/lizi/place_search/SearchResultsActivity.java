@@ -154,15 +154,15 @@ public class SearchResultsActivity extends AppCompatActivity {
     private void getNextPageResults() {
         currentPageNum++;
         prevPageBtn.setEnabled(true);
-        if(currentPageNum == maxPageNum) {
-            nextPageBtn.setEnabled(false);
-        }
-        Log.d("Next", "current page number: " + currentPageNum);
 
+        Log.d("Next", "current page number: " + currentPageNum);
 
         if(currentPageNum <= pages.size()) {
             placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1));
             resultsRecyclerView.setAdapter(placeAdapter);
+            if(currentPageNum == maxPageNum) {
+                nextPageBtn.setEnabled(false);
+            }
         } else {
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setMessage("Fetching next page");
