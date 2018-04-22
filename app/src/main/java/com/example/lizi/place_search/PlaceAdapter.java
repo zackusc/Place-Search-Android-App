@@ -1,6 +1,6 @@
 package com.example.lizi.place_search;
 
-import android.content.Context;
+
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,24 +13,35 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.placeViewHolder> {
+public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHolder> {
     private ArrayList<PlaceItem> placeList;
-//    private Context mContext;
+    private View.OnClickListener mClickListener;
 
     public PlaceAdapter(ArrayList<PlaceItem> list) {
         placeList = list;
     }
 
+    public void setOnItemClickListener(View.OnClickListener callback) {
+        mClickListener = callback;
+    }
+
     @NonNull
     @Override
-    public placeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PlaceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.place_item, parent, false);
-        return new placeViewHolder(v);
+        PlaceViewHolder holder = new PlaceViewHolder(v);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mClickListener.onClick(v);
+            }
+        });
+        return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull placeViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PlaceViewHolder holder, int position) {
         PlaceItem currentItem = placeList.get(position);
         String iconUrl = currentItem.getIconUrl();
         String placeName = currentItem.getName();
@@ -47,12 +58,12 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.placeViewHol
         return placeList.size();
     }
 
-    public class placeViewHolder extends RecyclerView.ViewHolder {
+    public class PlaceViewHolder extends RecyclerView.ViewHolder {
         public ImageView placeIconView;
         public TextView nameTextView;
         public TextView addressTextView;
 
-        public placeViewHolder(View itemView) {
+        public PlaceViewHolder(View itemView) {
             super(itemView);
             placeIconView = itemView.findViewById(R.id.categoryIcon);
             nameTextView = itemView.findViewById(R.id.place_name);

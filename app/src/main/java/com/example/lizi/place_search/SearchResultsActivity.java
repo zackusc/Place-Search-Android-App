@@ -99,14 +99,14 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         Log.d("results", "resultsList length: " + resultsList.size());
         placeAdapter = new PlaceAdapter(resultsList);
-
+        addRecyclerViewOnClickListener();
         Log.d("results", "current page number: " + currentPageNum);
+        resultsRecyclerView.setAdapter(placeAdapter);
 
         ArrayList<PlaceItem> copy = new ArrayList<>(resultsList);
         if(currentPageNum > pages.size()) {
             pages.add(copy);
         }
-        resultsRecyclerView.setAdapter(placeAdapter);
     }
 
     private void addListenerOnNavigation() {
@@ -141,6 +141,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                 currentPageNum--;
                 Log.d("prev", "current page number: " + currentPageNum);
                 placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1));
+                addRecyclerViewOnClickListener();
                 resultsRecyclerView.setAdapter(placeAdapter);
                 nextPageBtn.setEnabled(true);
                 if(currentPageNum == 1) {
@@ -159,6 +160,7 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         if(currentPageNum <= pages.size()) {
             placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1));
+            addRecyclerViewOnClickListener();
             resultsRecyclerView.setAdapter(placeAdapter);
             if(currentPageNum == maxPageNum) {
                 nextPageBtn.setEnabled(false);
@@ -195,6 +197,22 @@ public class SearchResultsActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void addRecyclerViewOnClickListener() {
+        placeAdapter.setOnItemClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int pos = resultsRecyclerView.getChildAdapterPosition(v);
+                Intent detailsIntent = new Intent(SearchResultsActivity.this, DetailsActivity.class);
+                PlaceItem placeItem = resultsList.get(pos);
+                String placeId = placeItem.getPlaceId();
+                Log.d("results", "no." + pos + " place is clicked!");
+                Log.d("results", "place_id: " + placeId);
+                detailsIntent.putExtra("place_id", placeId);
+                startActivity(detailsIntent);
+            }
+        });
     }
 
 
