@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -20,7 +20,35 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/results_RecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbarResults"
+        android:layout_above="@+id/paginationButtons"/>
+
+    <LinearLayout
+        android:id="@+id/paginationButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:orientation="horizontal"
+        android:layout_alignParentLeft="true">
+
+        <Button
+            android:id="@+id/buttonPrevPage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="PREVIOUS"
+            android:enabled="false"/>
+
+        <Button
+            android:id="@+id/buttonNextPage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="NEXT" />
+
+    </LinearLayout>
 
 
-</LinearLayout>
+</RelativeLayout>
