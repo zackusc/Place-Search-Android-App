@@ -67,6 +67,7 @@
     </TableRow>
 
     <TableRow
+        android:id="@+id/row_rating"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="5dp">
@@ -79,6 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <RatingBar
+                android:id="@+id/ratingBar"
                 style="@style/Base.Widget.AppCompat.RatingBar.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

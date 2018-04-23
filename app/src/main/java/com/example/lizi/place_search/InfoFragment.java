@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 
@@ -22,6 +24,8 @@ public class InfoFragment extends Fragment {
     private TextView priceTextView;
     private TextView googlePageTextView;
     private TextView webTextView;
+    private RatingBar mRatingBar;
+    private TableRow rowRating;
 
 
     public InfoFragment() {
@@ -61,6 +65,8 @@ public class InfoFragment extends Fragment {
         priceTextView = rootView.findViewById(R.id.info_price_level);
         googlePageTextView = rootView.findViewById(R.id.info_google_page);
         webTextView = rootView.findViewById(R.id.info_website);
+        mRatingBar = rootView.findViewById(R.id.ratingBar);
+        rowRating = rootView.findViewById(R.id.row_rating);
 
         try {
             parseJSON();
@@ -91,6 +97,12 @@ public class InfoFragment extends Fragment {
         if (detailsJsonObj.has("website")) {
             String website = detailsJsonObj.getString("website");
             webTextView.setText(website);
+        }
+        if (detailsJsonObj.has("rating")) {
+            float rating = (float) detailsJsonObj.getDouble("rating");
+            mRatingBar.setRating(rating);
+        } else {
+            rowRating.setVisibility(View.GONE);
         }
 
 
