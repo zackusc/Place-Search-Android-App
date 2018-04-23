@@ -2,9 +2,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.lizi.place_search.DetailsActivity">
+
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/action_share"
+        android:icon="@drawable/share"
+        android:title="action_share"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_favorite"
+        android:icon="@drawable/heart_fill_white"
+        android:title="action_favorite"
+        app:showAsAction="always"/>
+
+
 </menu>
