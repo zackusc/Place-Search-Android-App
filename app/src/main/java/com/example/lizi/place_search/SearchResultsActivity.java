@@ -210,6 +210,7 @@ public class SearchResultsActivity extends AppCompatActivity {
                 Log.d("results", "no." + pos + " place is clicked!");
                 Log.d("results", "place_id: " + placeId);
                 detailsIntent.putExtra("place_id", placeId);
+                detailsIntent.putExtra("place_name", placeItem.getName());
                 startActivity(detailsIntent);
             }
         });

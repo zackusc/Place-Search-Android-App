@@ -1,6 +1,8 @@
 package com.example.lizi.place_search;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,7 +23,30 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBufferResponse;
+import com.google.android.gms.location.places.PlacePhotoMetadataResponse;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
+
 public class DetailsActivity extends AppCompatActivity {
+
+    final String REQUEST_DETAILS_URL = "http://place-search-lizi0829.us-east-2.elasticbeanstalk.com/details";
+
+//    protected GeoDataClient mGeoDataClient;
+    private String placeId;
+    private String detailsJson;
+//    private Place myPlace;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -43,24 +68,18 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
+        Intent intent = getIntent();
+        placeId = intent.getStringExtra("place_id");
+        String placeName = intent.getStringExtra("place_name");
+        Log.d("details", "onCreate: placeId: " + placeId);
+
+        getPlaceDetails();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        toolbar.setTitle(placeName);
 
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-
-        Intent intent = getIntent();
-        String placeId = intent.getStringExtra("place_id");
-        Log.d("details", "onCreat: placeId: " + placeId);
+//        mGeoDataClient = Places.getGeoDataClient(this);
 
     }
 
@@ -136,13 +155,70 @@ public class DetailsActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            if (position == 0) {
+                Log.d("details", "send details to info: " + detailsJson);
+                return InfoFragment.newInstance(detailsJson);
+            } else {
+                return PlaceholderFragment.newInstance(position + 1);
+            }
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            // Show 4 total pages.
+            return 4;
         }
     }
+
+    private void getPlaceDetails() {
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Fetching details");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+
+        Log.d("fetch details", "placeId: " + placeId);
+
+        RequestParams params = new RequestParams();
+        params.put("place_id", placeId);
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(REQUEST_DETAILS_URL, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                detailsJson = response.toString();
+                Log.d("Fetch details", "Success! JSON: " + detailsJson);
+                progressDialog.dismiss();
+
+
+                // Create the adapter that will return a fragment for each of the three
+                // primary sections of the activity.
+                mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+                // Set up the ViewPager with the sections adapter.
+                mViewPager = (ViewPager) findViewById(R.id.container);
+                mViewPager.setAdapter(mSectionsPagerAdapter);
+
+                TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+
+                mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+                tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                Log.d("Fetch details", "Fail " + e.toString());
+                Log.d("Fetch details", "Status code " + statusCode);
+            }
+        });
+
+    }
+
+
+
+
 }
