@@ -2,6 +2,7 @@ package com.example.lizi.place_search;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -37,6 +38,9 @@ import com.loopj.android.http.RequestParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import cz.msebera.android.httpclient.Header;
 
 public class DetailsActivity extends AppCompatActivity {
@@ -44,9 +48,13 @@ public class DetailsActivity extends AppCompatActivity {
     final String REQUEST_DETAILS_URL = "http://place-search-lizi0829.us-east-2.elasticbeanstalk.com/details";
 
 //    protected GeoDataClient mGeoDataClient;
+    String placeName;
     private String placeId;
     private String detailsJson;
-//    private Place myPlace;
+    private JSONObject detailsJsonObj;
+    private String address;
+    private String twitterUrl;
+
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -70,7 +78,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         placeId = intent.getStringExtra("place_id");
-        String placeName = intent.getStringExtra("place_name");
+        placeName = intent.getStringExtra("place_name");
         Log.d("details", "onCreate: placeId: " + placeId);
 
         getPlaceDetails();
@@ -102,6 +110,10 @@ public class DetailsActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_share) {
+            Intent twitterIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(twitterUrl));
+            if (twitterIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(twitterIntent);
+            }
             return true;
         }
 
@@ -190,9 +202,16 @@ public class DetailsActivity extends AppCompatActivity {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                try {
+                    detailsJsonObj = response.getJSONObject("result");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 detailsJson = response.toString();
                 Log.d("Fetch details", "Success! JSON: " + detailsJson);
                 progressDialog.dismiss();
+
+                createTwitterContent();
 
 
                 // Create the adapter that will return a fragment for each of the three
@@ -218,6 +237,30 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    private void createTwitterContent() {
+        try {
+            address = detailsJsonObj.getString("formatted_address");
+            String website;
+            if (detailsJsonObj.has("website")) {
+                website = detailsJsonObj.getString("website");
+            } else {
+                website = detailsJsonObj.getString("url");
+            }
+
+            twitterUrl = "https://twitter.com/intent/tweet?";
+            String text = "Check out " + placeName + " located at " + address + "\nWebsite:";
+            text = URLEncoder.encode(text, "UTF-8");
+            website = URLEncoder.encode(website, "UTF-8");
+            twitterUrl += "text=" + text + "&url=" + website + "&hashtags=TravelAndEntertainmentSearch";
+            Log.d("details", "twitter url: " + twitterUrl);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
 
