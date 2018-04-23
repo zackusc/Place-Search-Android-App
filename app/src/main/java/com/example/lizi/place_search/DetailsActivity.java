@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -55,6 +56,8 @@ public class DetailsActivity extends AppCompatActivity {
     private String address;
     private String twitterUrl;
 
+    Toolbar toolbar;
+
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -83,9 +86,10 @@ public class DetailsActivity extends AppCompatActivity {
 
         getPlaceDetails();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(placeName);
+        addListenerOnNavigation();
 
 //        mGeoDataClient = Places.getGeoDataClient(this);
 
@@ -261,6 +265,20 @@ public class DetailsActivity extends AppCompatActivity {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+    }
+
+    private void addListenerOnNavigation() {
+        ActionBar ab = getSupportActionBar();
+
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setDisplayShowHomeEnabled(true);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
 
