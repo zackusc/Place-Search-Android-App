@@ -76,7 +76,7 @@
             android:text="@string/radio_other"/>
     </RadioGroup>
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/inputAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -17,7 +17,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -25,6 +27,11 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.location.places.AutocompletePrediction;
+import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -57,7 +64,13 @@ public class SearchTab extends Fragment {
     EditText keywordET;
     Spinner spinnerCategories;
     EditText distanceET;
-    EditText addressET;
+    AutoCompleteTextView addressET;
+    private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
+    protected GeoDataClient mGeoDataClient;
+
+    private static final LatLngBounds LAT_LNG_BOUNDS = new LatLngBounds(
+            new LatLng(-40, -168), new LatLng(71, 136)
+    );
 
 
     @Nullable
@@ -65,15 +78,21 @@ public class SearchTab extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.search_tab, container, false);
 
+
         keywordET = (EditText) view.findViewById(R.id.keyword);
         distanceET = (EditText) view.findViewById(R.id.distance);
-        addressET = (EditText) view.findViewById(R.id.inputAddress);
+        addressET = (AutoCompleteTextView) view.findViewById(R.id.inputAddress);
         radioLocationGroup = (RadioGroup) view.findViewById(R.id.radioLocation);
         spinnerCategories = (Spinner) view.findViewById(R.id.spinnerCategories);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity().getApplicationContext(),
                 android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategories.setAdapter(adapter);
+
+        mGeoDataClient = Places.getGeoDataClient(getActivity());
+        mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(getActivity(), mGeoDataClient, LAT_LNG_BOUNDS, null);
+        addressET.setAdapter(mPlaceAutocompleteAdapter);
+        addressET.setOnItemClickListener(mAutocompleteClickListener);
 
         getCurrentLocation();
         addListenerOnRadioButtons();
@@ -217,6 +236,14 @@ public class SearchTab extends Fragment {
             }
         });
 
-
     }
+
+    private AdapterView.OnItemClickListener mAutocompleteClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(position);
+            final String placeId = item.getPlaceId();
+        }
+    };
+
 }
