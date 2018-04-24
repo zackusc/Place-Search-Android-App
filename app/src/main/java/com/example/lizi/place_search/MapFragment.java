@@ -67,6 +67,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
                 R.array.travel_mode_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         travelModesSpinner.setAdapter(adapter);
+        travelModesSpinner.setOnItemSelectedListener(spinnerOnItemSelectedListener);
 
         mGeoDataClient = Places.getGeoDataClient(getActivity());
         mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(getActivity(), mGeoDataClient, LAT_LNG_BOUNDS, null);
@@ -96,6 +97,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
             final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(position);
             final String placeId = item.getPlaceId();
             Log.d(TAG, "retrieve place id from autocomplete: " + placeId);
+        }
+    };
+
+    private AdapterView.OnItemSelectedListener spinnerOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            Log.d(TAG, "spinner item selected：" + parent.getItemAtPosition(position).toString());
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+            Log.d(TAG, "Nothing selected");
         }
     };
 
