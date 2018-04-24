@@ -92,8 +92,6 @@ public class DetailsActivity extends AppCompatActivity {
         toolbar.setTitle(placeName);
         addListenerOnNavigation();
 
-//        mGeoDataClient = Places.getGeoDataClient(this);
-
     }
 
 
@@ -181,9 +179,12 @@ public class DetailsActivity extends AppCompatActivity {
                     return InfoFragment.newInstance(detailsJson);
                 case 1:
                     return PhotosFragment.newInstance(placeId);
+                case 2:
+                    return new MapFragment();
+                case 3:
+                    return new ReviewsFragment();
             }
-
-            return PlaceholderFragment.newInstance(position + 1);
+            return null;
 
         }
 

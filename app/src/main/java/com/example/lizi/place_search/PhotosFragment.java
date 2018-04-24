@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class PhotosFragment extends Fragment{
 
@@ -31,9 +34,11 @@ public class PhotosFragment extends Fragment{
     private Bitmap[] bitmaps;
     private int photoNum;
 
+    RecyclerView photosRecyclerView;
     PlacePhotoMetadataBuffer photoMetadataBuffer;
+    private PhotoAdapter photoAdapter;
 
-    private int check = 0;
+    private int check;
 
     ImageView sampleImage;
 
@@ -59,10 +64,14 @@ public class PhotosFragment extends Fragment{
         Log.d("photos", "onCreate placeId: " + placeId);
 
 //        mTextView = rootView.findViewById(R.id.textView2);
-        sampleImage = rootView.findViewById(R.id.imageView2);
+//        sampleImage = rootView.findViewById(R.id.imageView2);
 
         mGeoDataClient = Places.getGeoDataClient(getActivity());
 
+        photosRecyclerView = rootView.findViewById(R.id.photos_recyclerView);
+        photosRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        photoAdapter = new PhotoAdapter(new ArrayList<Bitmap>());
+        photosRecyclerView.setAdapter(photoAdapter);
         getPhotos();
 
         return rootView;
@@ -83,7 +92,8 @@ public class PhotosFragment extends Fragment{
 
                 Log.d("photos", "number of photos: " + photoNum);
 
-                bitmaps = new Bitmap[photoNum + 1];
+                bitmaps = new Bitmap[photoNum];
+                check = 0;
 
                 Log.d("photos", "bitmaps length" + bitmaps.length);
 
@@ -107,10 +117,31 @@ public class PhotosFragment extends Fragment{
                 Bitmap bitmap = photo.getBitmap();
                 bitmaps[n] = bitmap;
                 check++;
-                if(n == 4) {
-                    sampleImage.setImageBitmap(bitmaps[n]);
-                }
+
+                Log.d("photos", "no." + n + " photo is downloaded!");
+                Log.d("photos", "check=" + check);
+
                 if(check == photoNum) {
+
+                    boolean allDownloaded = true;
+
+
+
+                    ArrayList<Bitmap> photos = new ArrayList<>(Arrays.asList(bitmaps));
+//                    Log.d("photos", "arraylist size: " + photos.size());
+
+                    for(int k = 0; k < photoNum; k++) {
+                        if(bitmaps[k] == null) {
+                            allDownloaded = false;
+                        }
+                    }
+                    if (allDownloaded) {
+                        Log.d("photos", "all photos are downloaded");
+                    }
+
+
+                    photoAdapter = new PhotoAdapter(new ArrayList<>(Arrays.asList(bitmaps)));
+                    photosRecyclerView.setAdapter(photoAdapter);
                     photoMetadataBuffer.release();
                 }
             }
