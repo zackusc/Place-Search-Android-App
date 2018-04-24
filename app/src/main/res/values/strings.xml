@@ -1,4 +1,5 @@
 <resources>
+    <string name="google_geo_api_key">AIzaSyDnrHxhQ8T39Wy-l63kWgtreAiG1EjKanM</string>
     <string name="app_name">Places Search</string>
     <string name="main_tab_text_1">Search</string>
     <string name="main_tab_text_2">Favorites</string>
