@@ -36,6 +36,7 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -173,12 +174,17 @@ public class DetailsActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            if (position == 0) {
-                Log.d("details", "send details to info: " + detailsJson);
-                return InfoFragment.newInstance(detailsJson);
-            } else {
-                return PlaceholderFragment.newInstance(position + 1);
+
+            switch (position) {
+                case 0:
+                    Log.d("details", "send details to info: " + detailsJson);
+                    return InfoFragment.newInstance(detailsJson);
+                case 1:
+                    return PhotosFragment.newInstance(placeId);
             }
+
+            return PlaceholderFragment.newInstance(position + 1);
+
         }
 
         @Override
