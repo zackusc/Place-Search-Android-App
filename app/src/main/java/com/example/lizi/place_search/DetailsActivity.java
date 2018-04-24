@@ -30,6 +30,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.PlacePhotoMetadataResponse;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.loopj.android.http.AsyncHttpClient;
@@ -46,7 +47,7 @@ import java.net.URLEncoder;
 import cz.msebera.android.httpclient.Header;
 
 public class DetailsActivity extends AppCompatActivity {
-
+    final static String TAG = "details";
     final String REQUEST_DETAILS_URL = "http://place-search-lizi0829.us-east-2.elasticbeanstalk.com/details";
 
 //    protected GeoDataClient mGeoDataClient;
@@ -145,7 +146,16 @@ public class DetailsActivity extends AppCompatActivity {
                 case 1:
                     return PhotosFragment.newInstance(placeId);
                 case 2:
-                    return new MapFragment();
+                    try {
+                        JSONObject location = detailsJsonObj.getJSONObject("geometry").getJSONObject("location");
+                        double lat = location.getDouble("lat");
+                        double lng = location.getDouble("lng");
+                        LatLng latLng = new LatLng(lat, lng);
+                        Log.d(TAG, "send latLng to map: " + latLng.toString());
+                        return MapFragment.newInstance(latLng, placeName);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 case 3:
                     return new ReviewsFragment();
             }
