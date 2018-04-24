@@ -8,10 +8,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Spinner;
 
+import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -70,6 +72,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
         mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(getActivity(), mGeoDataClient, LAT_LNG_BOUNDS, null);
         addressAutocomplete = rootView.findViewById(R.id.map_input_address);
         addressAutocomplete.setAdapter(mPlaceAutocompleteAdapter);
+        addressAutocomplete.setOnItemClickListener(mAutocompleteClickListener);
 
 
 
@@ -82,8 +85,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback{
     @Override
     public void onMapReady(GoogleMap googleMap) {
         googleMap.addMarker(new MarkerOptions().position(mLatLng).title(placeName));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
         googleMap.moveCamera(CameraUpdateFactory.zoomTo(13));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(mLatLng));
 
     }
+
+    private AdapterView.OnItemClickListener mAutocompleteClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(position);
+            final String placeId = item.getPlaceId();
+            Log.d(TAG, "retrieve place id from autocomplete: " + placeId);
+        }
+    };
+
+
 }

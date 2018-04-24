@@ -92,7 +92,6 @@ public class SearchTab extends Fragment {
         mGeoDataClient = Places.getGeoDataClient(getActivity());
         mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(getActivity(), mGeoDataClient, LAT_LNG_BOUNDS, null);
         addressET.setAdapter(mPlaceAutocompleteAdapter);
-        addressET.setOnItemClickListener(mAutocompleteClickListener);
 
         getCurrentLocation();
         addListenerOnRadioButtons();
@@ -238,12 +237,5 @@ public class SearchTab extends Fragment {
 
     }
 
-    private AdapterView.OnItemClickListener mAutocompleteClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final AutocompletePrediction item = mPlaceAutocompleteAdapter.getItem(position);
-            final String placeId = item.getPlaceId();
-        }
-    };
 
 }
