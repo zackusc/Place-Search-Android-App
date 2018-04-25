@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-public class SearchResultsActivity extends AppCompatActivity {
+public class SearchResultsActivity extends AppCompatActivity implements PlaceAdapter.OnItemClickListener{
     final String NEXT_PAGE_URL = "http://place-search-lizi0829.us-east-2.elasticbeanstalk.com/results/nextpage";
     private RecyclerView resultsRecyclerView;
     private ArrayList<PlaceItem> resultsList;
@@ -99,7 +99,8 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         Log.d("results", "resultsList length: " + resultsList.size());
         placeAdapter = new PlaceAdapter(resultsList, PlaceAdapter.RESULTS_LIST);
-        addRecyclerViewOnClickListener();
+        placeAdapter.setOnItemClickListener(SearchResultsActivity.this);
+//        addRecyclerViewOnClickListener();
         Log.d("results", "current page number: " + currentPageNum);
         resultsRecyclerView.setAdapter(placeAdapter);
 
@@ -141,7 +142,8 @@ public class SearchResultsActivity extends AppCompatActivity {
                 currentPageNum--;
                 Log.d("prev", "current page number: " + currentPageNum);
                 placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1), PlaceAdapter.RESULTS_LIST);
-                addRecyclerViewOnClickListener();
+//                addRecyclerViewOnClickListener();
+                placeAdapter.setOnItemClickListener(SearchResultsActivity.this);
                 resultsRecyclerView.setAdapter(placeAdapter);
                 nextPageBtn.setEnabled(true);
                 if(currentPageNum == 1) {
@@ -160,7 +162,8 @@ public class SearchResultsActivity extends AppCompatActivity {
 
         if(currentPageNum <= pages.size()) {
             placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1), PlaceAdapter.RESULTS_LIST);
-            addRecyclerViewOnClickListener();
+//            addRecyclerViewOnClickListener();
+            placeAdapter.setOnItemClickListener(SearchResultsActivity.this);
             resultsRecyclerView.setAdapter(placeAdapter);
             if(currentPageNum == maxPageNum) {
                 nextPageBtn.setEnabled(false);
@@ -199,22 +202,35 @@ public class SearchResultsActivity extends AppCompatActivity {
         }
     }
 
-    private void addRecyclerViewOnClickListener() {
-        placeAdapter.setOnItemClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int pos = resultsRecyclerView.getChildAdapterPosition(v);
-                Intent detailsIntent = new Intent(SearchResultsActivity.this, DetailsActivity.class);
-                PlaceItem placeItem = resultsList.get(pos);
-                String placeId = placeItem.getPlaceId();
-                Log.d("results", "no." + pos + " place is clicked!");
-                Log.d("results", "place_id: " + placeId);
-                detailsIntent.putExtra("place_id", placeId);
-                detailsIntent.putExtra("place_name", placeItem.getName());
-                startActivity(detailsIntent);
-            }
-        });
+    @Override
+    public void onItemClick(int position) {
+        Intent detailsIntent = new Intent(this, DetailsActivity.class);
+        PlaceItem placeItem = resultsList.get(position);
+        String placeId = placeItem.getPlaceId();
+        Log.d("results", "no." + position + " place is clicked!");
+        Log.d("results", "place_id: " + placeId);
+        detailsIntent.putExtra("place_id", placeId);
+        detailsIntent.putExtra("place_name", placeItem.getName());
+        startActivity(detailsIntent);
+
     }
+
+//    private void addRecyclerViewOnClickListener() {
+//        placeAdapter.setOnItemClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                int pos = resultsRecyclerView.getChildAdapterPosition(v);
+//                Intent detailsIntent = new Intent(SearchResultsActivity.this, DetailsActivity.class);
+//                PlaceItem placeItem = resultsList.get(pos);
+//                String placeId = placeItem.getPlaceId();
+//                Log.d("results", "no." + pos + " place is clicked!");
+//                Log.d("results", "place_id: " + placeId);
+//                detailsIntent.putExtra("place_id", placeId);
+//                detailsIntent.putExtra("place_name", placeItem.getName());
+//                startActivity(detailsIntent);
+//            }
+//        });
+//    }
 
 
 

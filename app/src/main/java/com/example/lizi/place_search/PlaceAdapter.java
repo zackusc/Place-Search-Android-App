@@ -18,10 +18,10 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     public final static int RESULTS_LIST = 0;
     public final static int FAVORITES_LIST = 1;
     private ArrayList<PlaceItem> placeList;
-    private View.OnClickListener mClickListener;
+//    private View.OnClickListener mClickListener;
     private int placeListType;
 
-    private OnItemClickListener mOnItemClickListener;
+    private OnItemClickListener mListener;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
@@ -32,8 +32,12 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         this.placeListType = placeListType;
     }
 
-    public void setOnItemClickListener(View.OnClickListener callback) {
-        mClickListener = callback;
+//    public void setOnItemClickListener(View.OnClickListener callback) {
+//        mClickListener = callback;
+//    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
     }
 
     @NonNull
@@ -87,6 +91,18 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
             addressTextView = itemView.findViewById(R.id.place_address);
             favoriteBtn = itemView.findViewById(R.id.favorite_button);
             textAndImage = itemView.findViewById(R.id.place_text_image);
+
+            textAndImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mListener.onItemClick(position);
+                        }
+                    }
+                }
+            });
 
         }
     }
