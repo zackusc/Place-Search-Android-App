@@ -8,13 +8,15 @@ public class ReviewItem {
     private Date mDate;
     private String text;
     private String url;
+    private String authorImageUrl;
 
-    public ReviewItem(String authorName, float rating, Date date, String text, String url) {
+    public ReviewItem(String authorName, float rating, Date date, String text, String url, String imageUrl) {
         this.authorName = authorName;
         this.rating = rating;
         mDate = date;
         this.text = text;
         this.url = url;
+        authorImageUrl = imageUrl;
     }
 
     public String getAuthorName() {
@@ -37,6 +39,10 @@ public class ReviewItem {
         return url;
     }
 
+    public String getAuthorImageUrl() {
+        return authorImageUrl;
+    }
+
     @Override
     public String toString() {
         String str = "anthor name: " + authorName + "\n";
@@ -44,6 +50,7 @@ public class ReviewItem {
         str += "Date: " + mDate.toString() + "\n";
         str += "url: " + url + "\n";
         str += "text: " + text + "\n";
+        str += "author image url: " + authorImageUrl;
         return str;
     }
 }

@@ -75,7 +75,8 @@ public class ReviewsFragment extends Fragment {
                 Date date = new Date(review.getLong("time") * 1000);
                 String text = review.getString("text");
                 String url = review.getString("author_url");
-                ReviewItem reviewItem = new ReviewItem(authorName, rating, date, text, url);
+                String imageUrl = review.getString("profile_photo_url");
+                ReviewItem reviewItem = new ReviewItem(authorName, rating, date, text, url, imageUrl);
                 Log.d(TAG, "parseGoogleReviews:\n" + reviewItem);
                 googleReviews.add(reviewItem);
             }
@@ -115,7 +116,6 @@ public class ReviewsFragment extends Fragment {
         requestYelpReviewsFromServer(params);
     }
 
-
     private void requestYelpReviewsFromServer(RequestParams params) {
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(YELP_URL, params, new JsonHttpResponseHandler() {
@@ -123,6 +123,7 @@ public class ReviewsFragment extends Fragment {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
                 Log.d("Yelp", "Success! JSON: " + response.toString());
+//                parseYelpReviews(response);
             }
 
             @Override
@@ -132,5 +133,10 @@ public class ReviewsFragment extends Fragment {
             }
         });
     }
+
+//    private void parseYelpReviews(JSONObject json) {
+//
+//
+//    }
 
 }
