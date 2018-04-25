@@ -157,7 +157,7 @@ public class DetailsActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 case 3:
-                    return new ReviewsFragment();
+                    return ReviewsFragment.newInstance(detailsJsonObj.toString());
             }
             return null;
 
