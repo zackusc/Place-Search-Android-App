@@ -2,6 +2,7 @@ package com.example.lizi.place_search;
 
 
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,11 +15,21 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHolder> {
+    public final static int RESULTS_LIST = 0;
+    public final static int FAVORITES_LIST = 1;
     private ArrayList<PlaceItem> placeList;
     private View.OnClickListener mClickListener;
+    private int placeListType;
 
-    public PlaceAdapter(ArrayList<PlaceItem> list) {
+    private OnItemClickListener mOnItemClickListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public PlaceAdapter(ArrayList<PlaceItem> list, int placeListType) {
         placeList = list;
+        this.placeListType = placeListType;
     }
 
     public void setOnItemClickListener(View.OnClickListener callback) {
@@ -31,12 +42,12 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.place_item, parent, false);
         PlaceViewHolder holder = new PlaceViewHolder(v);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mClickListener.onClick(v);
-            }
-        });
+//        holder.textAndImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mClickListener.onClick(v);
+//            }
+//        });
         return holder;
     }
 
@@ -51,6 +62,10 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         holder.addressTextView.setText(address);
         Picasso.get().load(iconUrl).into(holder.placeIconView);
 
+        if (placeListType == FAVORITES_LIST) {
+            holder.favoriteBtn.setImageResource(R.drawable.heart_fill_red);
+        }
+
     }
 
     @Override
@@ -62,13 +77,16 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         public ImageView placeIconView;
         public TextView nameTextView;
         public TextView addressTextView;
+        public ImageView favoriteBtn;
+        public ConstraintLayout textAndImage;
 
         public PlaceViewHolder(View itemView) {
             super(itemView);
             placeIconView = itemView.findViewById(R.id.categoryIcon);
             nameTextView = itemView.findViewById(R.id.place_name);
             addressTextView = itemView.findViewById(R.id.place_address);
-
+            favoriteBtn = itemView.findViewById(R.id.favorite_button);
+            textAndImage = itemView.findViewById(R.id.place_text_image);
 
         }
     }

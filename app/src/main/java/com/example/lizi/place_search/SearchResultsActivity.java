@@ -98,7 +98,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         }
 
         Log.d("results", "resultsList length: " + resultsList.size());
-        placeAdapter = new PlaceAdapter(resultsList);
+        placeAdapter = new PlaceAdapter(resultsList, PlaceAdapter.RESULTS_LIST);
         addRecyclerViewOnClickListener();
         Log.d("results", "current page number: " + currentPageNum);
         resultsRecyclerView.setAdapter(placeAdapter);
@@ -140,7 +140,7 @@ public class SearchResultsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 currentPageNum--;
                 Log.d("prev", "current page number: " + currentPageNum);
-                placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1));
+                placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1), PlaceAdapter.RESULTS_LIST);
                 addRecyclerViewOnClickListener();
                 resultsRecyclerView.setAdapter(placeAdapter);
                 nextPageBtn.setEnabled(true);
@@ -159,7 +159,7 @@ public class SearchResultsActivity extends AppCompatActivity {
         Log.d("Next", "current page number: " + currentPageNum);
 
         if(currentPageNum <= pages.size()) {
-            placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1));
+            placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1), PlaceAdapter.RESULTS_LIST);
             addRecyclerViewOnClickListener();
             resultsRecyclerView.setAdapter(placeAdapter);
             if(currentPageNum == maxPageNum) {
