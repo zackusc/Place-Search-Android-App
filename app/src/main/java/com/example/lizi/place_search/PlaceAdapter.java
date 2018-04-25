@@ -2,7 +2,6 @@ package com.example.lizi.place_search;
 
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +24,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     private int placeListType;
     private OnItemClickListener mListener;
     private Context mContext;
+    private FavoritesManager mFavoritesManager;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
@@ -34,6 +34,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         mContext = context;
         placeList = list;
         this.placeListType = placeListType;
+        mFavoritesManager = new FavoritesManager();
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -46,8 +47,6 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.place_item, parent, false);
         PlaceViewHolder holder = new PlaceViewHolder(v);
-
-        setOnFavoriteButtonClickListener(parent.getContext(), holder.itemView);
 
 
         return holder;
@@ -66,6 +65,12 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
 
         if (placeListType == FAVORITES_LIST) {
             holder.favoriteBtn.setImageResource(R.drawable.heart_fill_red);
+        } else {
+            if (mFavoritesManager.isFavorited(mContext, currentItem.getPlaceId())) {
+                holder.favoriteBtn.setImageResource(R.drawable.heart_fill_red);
+            } else {
+                holder.favoriteBtn.setImageResource(R.drawable.heart_outline_black);
+            }
         }
 
     }
@@ -74,12 +79,6 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     public int getItemCount() {
         return placeList.size();
     }
-
-    private void setOnFavoriteButtonClickListener(Context context, final View view) {
-
-    }
-
-
 
 
 
@@ -117,17 +116,8 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
                     public void onClick(View v) {
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
-                            favoriteBtn.setImageResource(R.drawable.heart_fill_red);
                             PlaceItem placeItem = placeList.get(position);
-                            Gson gson = new Gson();
-                            String json = gson.toJson(placeItem);
-                            Log.d("Gson Serialization", "placeItem to json:\n" + json);
-//                            PlaceItem recovered = gson.fromJson(json, PlaceItem.class);
-//                            Log.d("Gson deserialization", "json to placeItem:\n" + recovered);
-//                            SharedPreferences sharedPref =
-
-
-
+                            mFavoritesManager.onFavoButtonClick(mContext, placeItem, favoriteBtn);
                         }
                     }
                 };
