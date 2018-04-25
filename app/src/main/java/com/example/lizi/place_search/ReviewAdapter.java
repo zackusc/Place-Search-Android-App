@@ -16,9 +16,14 @@ import java.util.Date;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>{
     private ArrayList<ReviewItem> reviewList;
+    private View.OnClickListener mClickListener;
 
     public ReviewAdapter(ArrayList<ReviewItem> reviewList) {
         this.reviewList = reviewList;
+    }
+
+    public void setOnItemClickListener(View.OnClickListener callback) {
+        mClickListener = callback;
     }
 
     @NonNull
@@ -27,6 +32,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.review_item, parent, false);
         ReviewViewHolder holder = new ReviewViewHolder(v);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mClickListener.onClick(v);
+            }
+        });
         return holder;
     }
 

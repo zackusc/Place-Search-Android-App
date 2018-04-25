@@ -1,5 +1,7 @@
 package com.example.lizi.place_search;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -107,7 +109,7 @@ public class ReviewsFragment extends Fragment {
         mRecyclerView = rootView.findViewById(R.id.reviews_recyclerview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mReviewAdapter = new ReviewAdapter(googleReviews);
-        Log.d(TAG, "google review size: " + googleReviews.size());
+        addOnItemClickListenerOnRecyclerView();
         mRecyclerView.setAdapter(mReviewAdapter);
 
         return rootView;
@@ -208,7 +210,20 @@ public class ReviewsFragment extends Fragment {
                 break;
         }
         mReviewAdapter = new ReviewAdapter(reviewsOnDisplay);
+        addOnItemClickListenerOnRecyclerView();
         mRecyclerView.setAdapter(mReviewAdapter);
+    }
+
+    private void addOnItemClickListenerOnRecyclerView() {
+        mReviewAdapter.setOnItemClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int pos = mRecyclerView.getChildAdapterPosition(v);
+                String url = reviewsOnDisplay.get(pos).getUrl();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+            }
+        });
     }
 
 }
