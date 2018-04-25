@@ -21,7 +21,7 @@ public class FavoritesManager {
         mGson = new Gson();
     }
 
-    public void onFavoButtonClick(Context context, PlaceItem place, ImageView favoBtn) {
+    public void onResultsFavoriteButtonClick(Context context, PlaceItem place, ImageView favoBtn) {
         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         String placeId = place.getPlaceId();
@@ -34,13 +34,23 @@ public class FavoritesManager {
             FavoritePlaceItem favoritePlace = new FavoritePlaceItem(place);
             String json = mGson.toJson(favoritePlace);
             editor.putString(placeId, json);
-            String text = place.getName() + "was added to favorites";
             favoBtn.setImageResource(R.drawable.heart_fill_red);
+            String text = place.getName() + "was added to favorites";
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
         }
         editor.commit();
-        getAllFavoritePlaces(context);
     }
+
+    public void removeFromFavorites(Context context, PlaceItem placeItem) {
+        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.remove(placeItem.getPlaceId());
+        editor.commit();
+        String text = placeItem.getName() + "was removed from favorites";
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+
+    }
+
 
     public boolean isFavorited(Context context, String placeId) {
         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);

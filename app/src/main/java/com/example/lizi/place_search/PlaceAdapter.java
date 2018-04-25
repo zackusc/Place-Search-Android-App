@@ -117,13 +117,28 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION) {
                             PlaceItem placeItem = placeList.get(position);
-                            mFavoritesManager.onFavoButtonClick(mContext, placeItem, favoriteBtn);
+                            mFavoritesManager.onResultsFavoriteButtonClick(mContext, placeItem, favoriteBtn);
                         }
                     }
                 };
+            } else {
+                clickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            PlaceItem placeItem = placeList.get(position);
+                            mFavoritesManager.removeFromFavorites(mContext, placeItem);
+                            placeList.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemMoved(position, placeList.size());
 
-                favoriteBtn.setOnClickListener(clickListener);
+                        }
+                    }
+                };
             }
+
+            favoriteBtn.setOnClickListener(clickListener);
 
         }
     }
