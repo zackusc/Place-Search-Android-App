@@ -51,15 +51,18 @@ import cz.msebera.android.httpclient.Header;
 public class DetailsActivity extends AppCompatActivity {
     final static String TAG = "details";
     final String REQUEST_DETAILS_URL = "http://place-search-lizi0829.us-east-2.elasticbeanstalk.com/details";
+    private final static String YELP_URL = "http://place-search-lizi0829.us-east-2.elasticbeanstalk.com/yelp";
 
-//    protected GeoDataClient mGeoDataClient;
+    //    protected GeoDataClient mGeoDataClient;
     String placeName;
     private String placeId;
     private String detailsJson;
     private JSONObject detailsJsonObj;
     private String address;
     private String twitterUrl;
+    private String yelpReviewsJson;
 
+    private ProgressDialog progressDialog;
     Toolbar toolbar;
 
 
@@ -159,7 +162,7 @@ public class DetailsActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 case 3:
-                    return ReviewsFragment.newInstance(detailsJsonObj.toString());
+                    return ReviewsFragment.newInstance(detailsJsonObj.toString(), yelpReviewsJson);
             }
             return null;
 
@@ -173,13 +176,7 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     private void getPlaceDetails() {
-
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Fetching details");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
-        progressDialog.setCancelable(false);
-
+        showProgressDialog();
         Log.d("fetch details", "placeId: " + placeId);
 
         RequestParams params = new RequestParams();
@@ -192,29 +189,13 @@ public class DetailsActivity extends AppCompatActivity {
                 super.onSuccess(statusCode, headers, response);
                 try {
                     detailsJsonObj = response.getJSONObject("result");
+                    fetchYelpReviews();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 detailsJson = response.toString();
                 Log.d("Fetch details", "Success! JSON: " + detailsJson);
-                progressDialog.dismiss();
-
                 createTwitterContent();
-
-
-                // Create the adapter that will return a fragment for each of the three
-                // primary sections of the activity.
-                mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-                // Set up the ViewPager with the sections adapter.
-                mViewPager = (ViewPager) findViewById(R.id.container);
-                mViewPager.setAdapter(mSectionsPagerAdapter);
-
-                TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-
-                mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-                tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-
 
             }
 
@@ -263,6 +244,81 @@ public class DetailsActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void fetchYelpReviews() throws JSONException {
+        Map<String, String> addressComponentsMap = new HashMap<>();
+        JSONArray addressComponentsJsonArray = detailsJsonObj.getJSONArray("address_components");
+        for(int i = 0; i < addressComponentsJsonArray.length(); i++) {
+            JSONObject addressComponent = addressComponentsJsonArray.getJSONObject(i);
+            String name = addressComponent.getString("short_name");
+            String type = addressComponent.getJSONArray("types").getString(0);
+            addressComponentsMap.put(type, name);
+        }
+
+        String name = detailsJsonObj.getString("name");
+        String city = addressComponentsMap.get("locality");
+        String state = addressComponentsMap.get("administrative_area_level_1");
+        String address1="";
+        String streetNum = addressComponentsMap.get("street_number");
+        String route = addressComponentsMap.get("route");
+        if(streetNum != null && route != null) {
+            address1 = streetNum + " " + route;
+        }
+        String address2 = city + ", " + state + " " + addressComponentsMap.get("postal_code");
+        RequestParams params = new RequestParams();
+        params.put("name", name);
+        params.put("address1", address1);
+        params.put("address2", address2);
+        params.put("city", city);
+        params.put("state", state);
+        params.put("country", addressComponentsMap.get("country"));
+
+        requestYelpReviewsFromServer(params);
+    }
+
+    private void requestYelpReviewsFromServer(RequestParams params) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(YELP_URL, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("Yelp", "Success! JSON: " + response.toString());
+                yelpReviewsJson = response.toString();
+                updateUI();
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                Log.d("Yelp", "Fail " + e.toString());
+                Log.d("Yelp", "Status code " + statusCode);
+            }
+        });
+    }
+
+    private void showProgressDialog() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Fetching details");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+    }
+
+    private void updateUI() {
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
     }
 
 

@@ -30,7 +30,6 @@ import cz.msebera.android.httpclient.Header;
 public class ReviewsFragment extends Fragment {
     public final static String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private final static String TAG = "reviews";
-    private final static String YELP_URL = "http://place-search-lizi0829.us-east-2.elasticbeanstalk.com/yelp";
     private JSONObject detailsJson;
     private ArrayList<ReviewItem> googleReviews;
     private ArrayList<ReviewItem> yelpReviews;
@@ -38,10 +37,11 @@ public class ReviewsFragment extends Fragment {
     public ReviewsFragment() {
     }
 
-    public static ReviewsFragment newInstance(String json) {
+    public static ReviewsFragment newInstance(String details, String yelpReviews) {
         ReviewsFragment fragment = new ReviewsFragment();
         Bundle args = new Bundle();
-        args.putString("details_json", json);
+        args.putString("details_json", details);
+        args.putString("yelp_reviews", yelpReviews);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,10 +55,11 @@ public class ReviewsFragment extends Fragment {
         yelpReviews = new ArrayList<>();
 
         String details = getArguments().getString("details_json");
+        String yelpReviewsJson = getArguments().getString("yelp_reviews");
         try {
             detailsJson = new JSONObject(details);
-            fetchYelpReviews();
             parseGoogleReviews();
+            parseYelpReviews(yelpReviewsJson);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -88,61 +89,9 @@ public class ReviewsFragment extends Fragment {
         }
     }
 
-    private void fetchYelpReviews() throws JSONException {
-        Map<String, String> addressComponentsMap = new HashMap<>();
-        JSONArray addressComponentsJsonArray = detailsJson.getJSONArray("address_components");
-        for(int i = 0; i < addressComponentsJsonArray.length(); i++) {
-            JSONObject addressComponent = addressComponentsJsonArray.getJSONObject(i);
-            String name = addressComponent.getString("short_name");
-            String type = addressComponent.getJSONArray("types").getString(0);
-            addressComponentsMap.put(type, name);
-        }
-
-        String name = detailsJson.getString("name");
-        String city = addressComponentsMap.get("locality");
-        String state = addressComponentsMap.get("administrative_area_level_1");
-        String address1="";
-        String streetNum = addressComponentsMap.get("street_number");
-        String route = addressComponentsMap.get("route");
-        if(streetNum != null && route != null) {
-            address1 = streetNum + " " + route;
-        }
-        String address2 = city + ", " + state + " " + addressComponentsMap.get("postal_code");
-        RequestParams params = new RequestParams();
-        params.put("name", name);
-        params.put("address1", address1);
-        params.put("address2", address2);
-        params.put("city", city);
-        params.put("state", state);
-        params.put("country", addressComponentsMap.get("country"));
-
-        requestYelpReviewsFromServer(params);
-    }
-
-    private void requestYelpReviewsFromServer(RequestParams params) {
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(YELP_URL, params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                Log.d("Yelp", "Success! JSON: " + response.toString());
-                try {
-                    parseYelpReviews(response);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
-                Log.d("Yelp", "Fail " + e.toString());
-                Log.d("Yelp", "Status code " + statusCode);
-            }
-        });
-    }
-
-    private void parseYelpReviews(JSONObject json) throws JSONException {
-        JSONArray yelpReviewsJsonArray = json.getJSONArray("reviews");
+    private void parseYelpReviews(String json) throws JSONException {
+        JSONObject yelpReviewsJsonObj = new JSONObject(json);
+        JSONArray yelpReviewsJsonArray = yelpReviewsJsonObj.getJSONArray("reviews");
         int length = yelpReviewsJsonArray.length();
         if(length == 0) {
             Log.e(TAG, "no yelp reviews");
@@ -162,7 +111,7 @@ public class ReviewsFragment extends Fragment {
                 String url = review.getString("url");
                 String imageUrl = review.getJSONObject("user").getString("image_url");
                 ReviewItem reviewItem = new ReviewItem(authorName, rating, date, text, url, imageUrl);
-                Log.d(TAG, "parseGoogleReviews:\n" + reviewItem);
+                Log.d(TAG, "parseYelpReviews:\n" + reviewItem);
                 yelpReviews.add(reviewItem);
             }
         }
