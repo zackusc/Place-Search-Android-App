@@ -1,15 +1,19 @@
 package com.example.lizi.place_search;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -18,23 +22,19 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     public final static int RESULTS_LIST = 0;
     public final static int FAVORITES_LIST = 1;
     private ArrayList<PlaceItem> placeList;
-//    private View.OnClickListener mClickListener;
     private int placeListType;
-
     private OnItemClickListener mListener;
+    private Context mContext;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
 
-    public PlaceAdapter(ArrayList<PlaceItem> list, int placeListType) {
+    public PlaceAdapter(Context context, ArrayList<PlaceItem> list, int placeListType) {
+        mContext = context;
         placeList = list;
         this.placeListType = placeListType;
     }
-
-//    public void setOnItemClickListener(View.OnClickListener callback) {
-//        mClickListener = callback;
-//    }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         mListener = listener;
@@ -46,12 +46,10 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.place_item, parent, false);
         PlaceViewHolder holder = new PlaceViewHolder(v);
-//        holder.textAndImage.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mClickListener.onClick(v);
-//            }
-//        });
+
+        setOnFavoriteButtonClickListener(parent.getContext(), holder.itemView);
+
+
         return holder;
     }
 
@@ -76,6 +74,14 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     public int getItemCount() {
         return placeList.size();
     }
+
+    private void setOnFavoriteButtonClickListener(Context context, final View view) {
+
+    }
+
+
+
+
 
     public class PlaceViewHolder extends RecyclerView.ViewHolder {
         public ImageView placeIconView;
@@ -103,6 +109,31 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
                     }
                 }
             });
+
+            View.OnClickListener clickListener;
+            if (placeListType == RESULTS_LIST) {
+                clickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            favoriteBtn.setImageResource(R.drawable.heart_fill_red);
+                            PlaceItem placeItem = placeList.get(position);
+                            Gson gson = new Gson();
+                            String json = gson.toJson(placeItem);
+                            Log.d("Gson Serialization", "placeItem to json:\n" + json);
+//                            PlaceItem recovered = gson.fromJson(json, PlaceItem.class);
+//                            Log.d("Gson deserialization", "json to placeItem:\n" + recovered);
+//                            SharedPreferences sharedPref =
+
+
+
+                        }
+                    }
+                };
+
+                favoriteBtn.setOnClickListener(clickListener);
+            }
 
         }
     }

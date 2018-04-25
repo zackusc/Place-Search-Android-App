@@ -98,7 +98,7 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
         }
 
         Log.d("results", "resultsList length: " + resultsList.size());
-        placeAdapter = new PlaceAdapter(resultsList, PlaceAdapter.RESULTS_LIST);
+        placeAdapter = new PlaceAdapter(this, resultsList, PlaceAdapter.RESULTS_LIST);
         placeAdapter.setOnItemClickListener(SearchResultsActivity.this);
 //        addRecyclerViewOnClickListener();
         Log.d("results", "current page number: " + currentPageNum);
@@ -141,7 +141,7 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
             public void onClick(View v) {
                 currentPageNum--;
                 Log.d("prev", "current page number: " + currentPageNum);
-                placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1), PlaceAdapter.RESULTS_LIST);
+                placeAdapter = new PlaceAdapter(SearchResultsActivity.this, pages.get(currentPageNum - 1), PlaceAdapter.RESULTS_LIST);
 //                addRecyclerViewOnClickListener();
                 placeAdapter.setOnItemClickListener(SearchResultsActivity.this);
                 resultsRecyclerView.setAdapter(placeAdapter);
@@ -161,7 +161,7 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
         Log.d("Next", "current page number: " + currentPageNum);
 
         if(currentPageNum <= pages.size()) {
-            placeAdapter = new PlaceAdapter(pages.get(currentPageNum - 1), PlaceAdapter.RESULTS_LIST);
+            placeAdapter = new PlaceAdapter(SearchResultsActivity.this,pages.get(currentPageNum - 1), PlaceAdapter.RESULTS_LIST);
 //            addRecyclerViewOnClickListener();
             placeAdapter.setOnItemClickListener(SearchResultsActivity.this);
             resultsRecyclerView.setAdapter(placeAdapter);
@@ -212,26 +212,6 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
         detailsIntent.putExtra("place_id", placeId);
         detailsIntent.putExtra("place_name", placeItem.getName());
         startActivity(detailsIntent);
-
     }
-
-//    private void addRecyclerViewOnClickListener() {
-//        placeAdapter.setOnItemClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                int pos = resultsRecyclerView.getChildAdapterPosition(v);
-//                Intent detailsIntent = new Intent(SearchResultsActivity.this, DetailsActivity.class);
-//                PlaceItem placeItem = resultsList.get(pos);
-//                String placeId = placeItem.getPlaceId();
-//                Log.d("results", "no." + pos + " place is clicked!");
-//                Log.d("results", "place_id: " + placeId);
-//                detailsIntent.putExtra("place_id", placeId);
-//                detailsIntent.putExtra("place_name", placeItem.getName());
-//                startActivity(detailsIntent);
-//            }
-//        });
-//    }
-
-
 
 }
