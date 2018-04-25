@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -25,6 +26,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +43,8 @@ public class ReviewsFragment extends Fragment {
     private ArrayList<ReviewItem> reviewsOnDisplay;
     private ArrayList<ReviewItem> googleReviews;
     private ArrayList<ReviewItem> yelpReviews;
+
+
 
     private String[] reviewTypes = {"Google reviews", "Yelp reviews"};
     private String[] orderTypes = {
@@ -97,6 +102,7 @@ public class ReviewsFragment extends Fragment {
                 android.R.layout.simple_spinner_item, orderTypes);
         ordersAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         reviewsOrderSpinner.setAdapter(ordersAdapter);
+        addOnItemSelectedListenerOnSpinners();
 
         mRecyclerView = rootView.findViewById(R.id.reviews_recyclerview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -156,15 +162,53 @@ public class ReviewsFragment extends Fragment {
 
     }
 
-    private void updateRecylcerView() {
+    private void addOnItemSelectedListenerOnSpinners() {
+        AdapterView.OnItemSelectedListener mListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(!googleReviews.isEmpty()) {
+                    updateRecyclerView();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        };
+        reviewsOrderSpinner.setOnItemSelectedListener(mListener);
+        reviewsTypeSpinner.setOnItemSelectedListener(mListener);
+
+    }
+
+    private void updateRecyclerView() {
         int reviewTypeNum = reviewsTypeSpinner.getSelectedItemPosition();
         int orderTypeNum = reviewsOrderSpinner.getSelectedItemPosition();
         if(reviewTypeNum == 0) {
-            reviewsOnDisplay = googleReviews;
+            reviewsOnDisplay = new ArrayList<>(googleReviews);
         } else {
-            reviewsOnDisplay = yelpReviews;
+            reviewsOnDisplay = new ArrayList<>(yelpReviews);
         }
-
+        switch (orderTypeNum) {
+            case 0:
+                break;
+            case 1:
+                Collections.sort(reviewsOnDisplay, ReviewItem.ReviewRatingComparator);
+                Collections.reverse(reviewsOnDisplay);
+                break;
+            case 2:
+                Collections.sort(reviewsOnDisplay, ReviewItem.ReviewRatingComparator);
+                break;
+            case 3:
+                Collections.sort(reviewsOnDisplay, ReviewItem.ReviewDateComparator);
+                Collections.reverse(reviewsOnDisplay);
+                break;
+            case 4:
+                Collections.sort(reviewsOnDisplay, ReviewItem.ReviewDateComparator);
+                break;
+        }
+        mReviewAdapter = new ReviewAdapter(reviewsOnDisplay);
+        mRecyclerView.setAdapter(mReviewAdapter);
     }
 
 }

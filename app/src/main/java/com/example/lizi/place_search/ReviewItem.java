@@ -1,5 +1,6 @@
 package com.example.lizi.place_search;
 
+import java.util.Comparator;
 import java.util.Date;
 
 public class ReviewItem {
@@ -53,4 +54,22 @@ public class ReviewItem {
         str += "author image url: " + authorImageUrl;
         return str;
     }
+
+    public static Comparator<ReviewItem> ReviewRatingComparator = new Comparator<ReviewItem>() {
+        @Override
+        public int compare(ReviewItem o1, ReviewItem o2) {
+            Float rating1 = o1.getRating();
+            Float rating2 = o2.getRating();
+            return rating1.compareTo(rating2);
+        }
+    };
+
+    public static Comparator<ReviewItem> ReviewDateComparator = new Comparator<ReviewItem>() {
+        @Override
+        public int compare(ReviewItem o1, ReviewItem o2) {
+            return o1.mDate.compareTo(o2.mDate);
+        }
+    };
+
+
 }
