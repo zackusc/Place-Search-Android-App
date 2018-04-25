@@ -9,6 +9,8 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 
@@ -55,8 +57,18 @@ public class FavoritesManager {
             FavoritePlaceItem favorite = mGson.fromJson(json, FavoritePlaceItem.class);
             favorites.add(favorite);
         }
-        Log.d("favorites", "num: " + favorites.size());
+
+        Collections.sort(favorites, new Comparator<FavoritePlaceItem>() {
+            @Override
+            public int compare(FavoritePlaceItem o1, FavoritePlaceItem o2) {
+                return (int) (o1.getTimestamp() - o2.getTimestamp());
+            }
+        });
+
+
+
         return favorites;
+
     }
 
 

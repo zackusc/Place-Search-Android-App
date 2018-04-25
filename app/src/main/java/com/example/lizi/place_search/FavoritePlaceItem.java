@@ -5,6 +5,10 @@ import java.util.Date;
 public class FavoritePlaceItem extends PlaceItem{
     private long timestamp;
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
     public FavoritePlaceItem(String imageUrl, String placeName, String addr, String placeID) {
         super(imageUrl, placeName, addr, placeID);
         timestamp = new Date().getTime();
