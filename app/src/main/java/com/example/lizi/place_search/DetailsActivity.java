@@ -43,6 +43,8 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -262,8 +264,6 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
 
 }

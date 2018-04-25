@@ -9,6 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,6 +22,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
+
+import cz.msebera.android.httpclient.Header;
 
 public class ReviewsFragment extends Fragment {
     private final static String TAG = "reviews";
@@ -43,12 +49,13 @@ public class ReviewsFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_reviews, container, false);
 
         googleReviews = new ArrayList<>();
+        yelpReviews = new ArrayList<>();
 
         String details = getArguments().getString("details_json");
         try {
             detailsJson = new JSONObject(details);
+            fetchYelpReviews();
             parseGoogleReviews();
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -77,10 +84,53 @@ public class ReviewsFragment extends Fragment {
         }
     }
 
-//    private void fetchYelpReviews() {
-//        Map<String, String> addressComponents = new HashMap<>();
-//
-//    }
+    private void fetchYelpReviews() throws JSONException {
+        Map<String, String> addressComponentsMap = new HashMap<>();
+        JSONArray addressComponentsJsonArray = detailsJson.getJSONArray("address_components");
+        for(int i = 0; i < addressComponentsJsonArray.length(); i++) {
+            JSONObject addressComponent = addressComponentsJsonArray.getJSONObject(i);
+            String name = addressComponent.getString("short_name");
+            String type = addressComponent.getJSONArray("types").getString(0);
+            addressComponentsMap.put(type, name);
+        }
 
+        String name = detailsJson.getString("name");
+        String city = addressComponentsMap.get("locality");
+        String state = addressComponentsMap.get("administrative_area_level_1");
+        String address1="";
+        String streetNum = addressComponentsMap.get("street_number");
+        String route = addressComponentsMap.get("route");
+        if(streetNum != null && route != null) {
+            address1 = streetNum + " " + route;
+        }
+        String address2 = city + ", " + state + " " + addressComponentsMap.get("postal_code");
+        RequestParams params = new RequestParams();
+        params.put("name", name);
+        params.put("address1", address1);
+        params.put("address2", address2);
+        params.put("city", city);
+        params.put("state", state);
+        params.put("country", addressComponentsMap.get("country"));
+
+        requestYelpReviewsFromServer(params);
+    }
+
+
+    private void requestYelpReviewsFromServer(RequestParams params) {
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(YELP_URL, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("Yelp", "Success! JSON: " + response.toString());
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                Log.d("Yelp", "Fail " + e.toString());
+                Log.d("Yelp", "Status code " + statusCode);
+            }
+        });
+    }
 
 }
