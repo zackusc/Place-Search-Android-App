@@ -4,10 +4,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -17,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,11 +33,28 @@ import java.util.TreeSet;
 import cz.msebera.android.httpclient.Header;
 
 public class ReviewsFragment extends Fragment {
-    public final static String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public final static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     private final static String TAG = "reviews";
     private JSONObject detailsJson;
+    private ArrayList<ReviewItem> reviewsOnDisplay;
     private ArrayList<ReviewItem> googleReviews;
     private ArrayList<ReviewItem> yelpReviews;
+
+    private String[] reviewTypes = {"Google reviews", "Yelp reviews"};
+    private String[] orderTypes = {
+            "Default order",
+            "Highest rating",
+            "Lowest rating",
+            "Most recent",
+            "Least recent"
+    };
+
+
+    private Spinner reviewsTypeSpinner;
+    private Spinner reviewsOrderSpinner;
+    private RecyclerView mRecyclerView;
+    private ReviewAdapter mReviewAdapter;
 
     public ReviewsFragment() {
     }
@@ -50,7 +72,7 @@ public class ReviewsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_reviews, container, false);
-
+        reviewsOnDisplay = new ArrayList<>();
         googleReviews = new ArrayList<>();
         yelpReviews = new ArrayList<>();
 
@@ -64,6 +86,23 @@ public class ReviewsFragment extends Fragment {
             e.printStackTrace();
         }
 
+        reviewsTypeSpinner = rootView.findViewById(R.id.reviews_type_spinner);
+        reviewsOrderSpinner = rootView.findViewById(R.id.reviews_order_spinner);
+        ArrayAdapter<String> typesAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(),
+                android.R.layout.simple_spinner_item, reviewTypes);
+        typesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        reviewsTypeSpinner.setAdapter(typesAdapter);
+
+        ArrayAdapter<String> ordersAdapter = new ArrayAdapter<>(getActivity().getApplicationContext(),
+                android.R.layout.simple_spinner_item, orderTypes);
+        ordersAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        reviewsOrderSpinner.setAdapter(ordersAdapter);
+
+        mRecyclerView = rootView.findViewById(R.id.reviews_recyclerview);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mReviewAdapter = new ReviewAdapter(googleReviews);
+        Log.d(TAG, "google review size: " + googleReviews.size());
+        mRecyclerView.setAdapter(mReviewAdapter);
 
         return rootView;
     }
@@ -100,10 +139,9 @@ public class ReviewsFragment extends Fragment {
                 JSONObject review = yelpReviewsJsonArray.getJSONObject(i);
                 String authorName = review.getJSONObject("user").getString("name");
                 float rating = review.getInt("rating");
-                SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
                 Date date = null;
                 try {
-                    date = dateFormat.parse(review.getString("time_created"));
+                    date = DATE_FORMAT.parse(review.getString("time_created"));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -114,6 +152,17 @@ public class ReviewsFragment extends Fragment {
                 Log.d(TAG, "parseYelpReviews:\n" + reviewItem);
                 yelpReviews.add(reviewItem);
             }
+        }
+
+    }
+
+    private void updateRecylcerView() {
+        int reviewTypeNum = reviewsTypeSpinner.getSelectedItemPosition();
+        int orderTypeNum = reviewsOrderSpinner.getSelectedItemPosition();
+        if(reviewTypeNum == 0) {
+            reviewsOnDisplay = googleReviews;
+        } else {
+            reviewsOnDisplay = yelpReviews;
         }
 
     }
