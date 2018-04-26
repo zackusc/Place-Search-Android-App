@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -62,6 +63,7 @@ public class ReviewsFragment extends Fragment {
     private Spinner reviewsOrderSpinner;
     private RecyclerView mRecyclerView;
     private ReviewAdapter mReviewAdapter;
+    private TextView noReviewsText;
 
     public ReviewsFragment() {
     }
@@ -79,6 +81,8 @@ public class ReviewsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_reviews, container, false);
+        noReviewsText = rootView.findViewById(R.id.no_reviews);
+
         reviewsOnDisplay = new ArrayList<>();
         googleReviews = new ArrayList<>();
         yelpReviews = new ArrayList<>();
@@ -133,6 +137,7 @@ public class ReviewsFragment extends Fragment {
             }
         } else {
             Log.e(TAG, "no google reviews");
+            noReviewsText.setVisibility(View.VISIBLE);
         }
     }
 
@@ -184,6 +189,7 @@ public class ReviewsFragment extends Fragment {
     }
 
     private void updateRecyclerView() {
+        noReviewsText.setVisibility(View.GONE);
         int reviewTypeNum = reviewsTypeSpinner.getSelectedItemPosition();
         int orderTypeNum = reviewsOrderSpinner.getSelectedItemPosition();
         if(reviewTypeNum == 0) {
@@ -191,6 +197,10 @@ public class ReviewsFragment extends Fragment {
         } else {
             reviewsOnDisplay = new ArrayList<>(yelpReviews);
         }
+        if(reviewsOnDisplay.size() == 0) {
+            noReviewsText.setVisibility(View.VISIBLE);
+        }
+
         switch (orderTypeNum) {
             case 0:
                 break;
