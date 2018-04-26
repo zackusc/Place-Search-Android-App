@@ -34,13 +34,13 @@ public class PhotosFragment extends Fragment{
     private Bitmap[] bitmaps;
     private int photoNum;
 
+    private TextView noPhotosMessge;
     RecyclerView photosRecyclerView;
     PlacePhotoMetadataBuffer photoMetadataBuffer;
     private PhotoAdapter photoAdapter;
 
     private int check;
     private boolean allDownloaded;
-
 
     public PhotosFragment() {
     }
@@ -56,6 +56,7 @@ public class PhotosFragment extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        photoNum = 0;
         placeId = getArguments().getString("place_id");
         Log.d("photos", "onCreate placeId: " + placeId);
         mGeoDataClient = Places.getGeoDataClient(getActivity());
@@ -74,6 +75,7 @@ public class PhotosFragment extends Fragment{
 //        if (getArguments() != null) {
 //            ArrayList<Bitmap> photos = getArguments().getParcelableArrayList("photos");
 //        }
+        noPhotosMessge = rootView.findViewById(R.id.no_photos);
 
         photosRecyclerView = rootView.findViewById(R.id.photos_recyclerView);
         photosRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -83,7 +85,11 @@ public class PhotosFragment extends Fragment{
             photoAdapter = new PhotoAdapter(new ArrayList<Bitmap>());
         }
         photosRecyclerView.setAdapter(photoAdapter);
-//        getPhotos();
+
+        if (photoAdapter.getItemCount() == 0) {
+            noPhotosMessge.setVisibility(View.VISIBLE);
+            Log.e(TAG, "No photos set onCreateView");
+        }
         return rootView;
     }
 
@@ -98,6 +104,16 @@ public class PhotosFragment extends Fragment{
                 // Get the PlacePhotoMetadataBuffer (metadata for all of the photos).
                 photoMetadataBuffer = photos.getPhotoMetadata();
                 photoNum = photoMetadataBuffer.getCount();
+
+                if (photoNum == 0) {
+                    photoAdapter = new PhotoAdapter(new ArrayList<Bitmap>());
+                    photosRecyclerView.setAdapter(photoAdapter);
+                    noPhotosMessge.setVisibility(View.VISIBLE);
+                    Log.e(TAG, "No photos set in getPhotos");
+                    return;
+                }
+
+                noPhotosMessge.setVisibility(View.GONE);
 
                 Log.d("photos", "number of photos: " + photoNum);
 
