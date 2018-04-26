@@ -27,14 +27,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class PhotosFragment extends Fragment{
-    private final static String TAG = "Map";
+    private final static String TAG = "Photos";
 
     private String placeId;
     protected GeoDataClient mGeoDataClient;
     private Bitmap[] bitmaps;
     private int photoNum;
 
-    private TextView noPhotosMessge;
+    private TextView noPhotosMessage;
     RecyclerView photosRecyclerView;
     PlacePhotoMetadataBuffer photoMetadataBuffer;
     private PhotoAdapter photoAdapter;
@@ -75,7 +75,7 @@ public class PhotosFragment extends Fragment{
 //        if (getArguments() != null) {
 //            ArrayList<Bitmap> photos = getArguments().getParcelableArrayList("photos");
 //        }
-        noPhotosMessge = rootView.findViewById(R.id.no_photos);
+        noPhotosMessage = rootView.findViewById(R.id.no_photos);
 
         photosRecyclerView = rootView.findViewById(R.id.photos_recyclerView);
         photosRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -87,7 +87,7 @@ public class PhotosFragment extends Fragment{
         photosRecyclerView.setAdapter(photoAdapter);
 
         if (photoAdapter.getItemCount() == 0) {
-            noPhotosMessge.setVisibility(View.VISIBLE);
+            noPhotosMessage.setVisibility(View.VISIBLE);
             Log.e(TAG, "No photos set onCreateView");
         }
         return rootView;
@@ -108,12 +108,12 @@ public class PhotosFragment extends Fragment{
                 if (photoNum == 0) {
                     photoAdapter = new PhotoAdapter(new ArrayList<Bitmap>());
                     photosRecyclerView.setAdapter(photoAdapter);
-                    noPhotosMessge.setVisibility(View.VISIBLE);
+                    noPhotosMessage.setVisibility(View.VISIBLE);
                     Log.e(TAG, "No photos set in getPhotos");
                     return;
                 }
 
-                noPhotosMessge.setVisibility(View.GONE);
+                noPhotosMessage.setVisibility(View.GONE);
 
                 Log.d("photos", "number of photos: " + photoNum);
 
