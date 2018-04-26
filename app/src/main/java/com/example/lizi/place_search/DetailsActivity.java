@@ -33,6 +33,7 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -64,6 +65,10 @@ public class DetailsActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
     Toolbar toolbar;
+    private Menu menu;
+    private FavoritesManager mFavoritesManager;
+    private boolean isFavorited;
+    private PlaceItem mPlaceItem;
 
 
     /**
@@ -89,6 +94,8 @@ public class DetailsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         placeId = intent.getStringExtra("place_id");
         placeName = intent.getStringExtra("place_name");
+        String json = intent.getStringExtra("place_item");
+        mPlaceItem = new Gson().fromJson(json, PlaceItem.class);
         Log.d("details", "onCreate: placeId: " + placeId);
 
         getPlaceDetails();
@@ -98,6 +105,8 @@ public class DetailsActivity extends AppCompatActivity {
         toolbar.setTitle(placeName);
         addListenerOnNavigation();
 
+        mFavoritesManager = new FavoritesManager();
+        isFavorited = mFavoritesManager.isFavorited(this, placeId);
     }
 
 
@@ -105,6 +114,14 @@ public class DetailsActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_details, menu);
+
+        if (isFavorited) {
+            menu.getItem(1).setIcon(R.drawable.heart_fill_white);
+        } else {
+            menu.getItem(1).setIcon(R.drawable.heart_outline_white);
+        }
+
+        this.menu = menu;
         return true;
     }
 
@@ -116,6 +133,14 @@ public class DetailsActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_favorite) {
+            if(isFavorited) {
+                mFavoritesManager.removeFromFavorites(this, mPlaceItem);
+                item.setIcon(R.drawable.heart_outline_white);
+            } else {
+                mFavoritesManager.addToFavorites(this, mPlaceItem);
+                item.setIcon(R.drawable.heart_fill_white);
+            }
+            isFavorited = !isFavorited;
             return true;
         }
         if (id == R.id.action_share) {
@@ -207,7 +232,6 @@ public class DetailsActivity extends AppCompatActivity {
         });
 
     }
-
 
     private void createTwitterContent() {
         try {

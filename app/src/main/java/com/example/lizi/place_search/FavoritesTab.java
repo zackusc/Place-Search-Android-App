@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 
 public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickListener{
@@ -50,6 +52,9 @@ public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickLi
         Log.d("results", "place_id: " + placeId);
         detailsIntent.putExtra("place_id", placeId);
         detailsIntent.putExtra("place_name", placeItem.getName());
+        Gson gson = new Gson();
+        String json = gson.toJson(placeItem);
+        detailsIntent.putExtra("place_item", json);
         startActivity(detailsIntent);
     }
 

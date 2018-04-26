@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -209,8 +210,11 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
         String placeId = placeItem.getPlaceId();
         Log.d("results", "no." + position + " place is clicked!");
         Log.d("results", "place_id: " + placeId);
+        Gson gson = new Gson();
+        String json = gson.toJson(placeItem);
         detailsIntent.putExtra("place_id", placeId);
         detailsIntent.putExtra("place_name", placeItem.getName());
+        detailsIntent.putExtra("place_item", json);
         startActivity(detailsIntent);
     }
 

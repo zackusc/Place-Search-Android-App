@@ -46,9 +46,21 @@ public class FavoritesManager {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.remove(placeItem.getPlaceId());
         editor.commit();
-        String text = placeItem.getName() + "was removed from favorites";
+        String text = placeItem.getName() + " was removed from favorites";
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+    }
 
+
+    public void addToFavorites(Context context, PlaceItem place) {
+        SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        String placeId = place.getPlaceId();
+        FavoritePlaceItem favoritePlace = new FavoritePlaceItem(place);
+        String json = mGson.toJson(favoritePlace);
+        editor.putString(placeId, json);
+        editor.commit();
+        String text = place.getName() + " was added to favorites";
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 
 
