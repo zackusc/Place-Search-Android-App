@@ -17,7 +17,9 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickListener{
+public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickListener, PlaceAdapter.OnFavoriteButtonClickListener{
+    private final static String TAG = "Favorites";
+
     private RecyclerView favoritesRecyclerView;
     private FavoritesManager mFavoritesManager;
     private PlaceAdapter mAdapter;
@@ -47,6 +49,7 @@ public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickLi
         favoritesList.addAll(favorites);
         mAdapter = new PlaceAdapter(getActivity(), favoritesList, PlaceAdapter.FAVORITES_LIST);
         mAdapter.setOnItemClickListener(this);
+        mAdapter.setOnFavoriteButtonClickListener(this);
         favoritesRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity()));
         favoritesRecyclerView.setAdapter(mAdapter);
     }
@@ -65,6 +68,19 @@ public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickLi
         detailsIntent.putExtra("place_item", json);
         startActivity(detailsIntent);
     }
+
+    @Override
+    public void onFavoriteButtonClick(int position) {
+        PlaceItem place = favoritesList.get(position);
+        Log.d(TAG, "placed removed:" + place);
+        mFavoritesManager.removeFromFavorites(getActivity(), place);
+        mAdapter.removeItemAt(position);
+        if (mAdapter.getItemCount() == 0) {
+//        if (favoritesList.size() == 0) { //this check is also doable
+            noFavorites.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     public class WrapContentLinearLayoutManager extends LinearLayoutManager {
         public WrapContentLinearLayoutManager(Context context) {

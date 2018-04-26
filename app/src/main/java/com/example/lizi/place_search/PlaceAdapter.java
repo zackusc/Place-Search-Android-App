@@ -25,9 +25,14 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     private OnItemClickListener mListener;
     private Context mContext;
     private FavoritesManager mFavoritesManager;
+    private OnFavoriteButtonClickListener mFavoriteButtonClickListener;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
+    }
+
+    public interface OnFavoriteButtonClickListener {
+        void onFavoriteButtonClick(int position);
     }
 
     public PlaceAdapter(Context context, ArrayList<PlaceItem> list, int placeListType) {
@@ -41,13 +46,16 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
         mListener = listener;
     }
 
+    public void setOnFavoriteButtonClickListener(OnFavoriteButtonClickListener listener) {
+        mFavoriteButtonClickListener = listener;
+    }
+
     @NonNull
     @Override
     public PlaceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.place_item, parent, false);
         PlaceViewHolder holder = new PlaceViewHolder(v);
-
 
         return holder;
     }
@@ -81,6 +89,13 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
     }
 
 
+    public void removeItemAt(int position) {
+        placeList.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, placeList.size());
+    }
+
+
 
     public class PlaceViewHolder extends RecyclerView.ViewHolder {
         public ImageView placeIconView;
@@ -109,6 +124,19 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
                 }
             });
 
+            favoriteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mFavoriteButtonClickListener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            mFavoriteButtonClickListener.onFavoriteButtonClick(position);
+                        }
+                    }
+                }
+            });
+
+
             View.OnClickListener clickListener;
             if (placeListType == RESULTS_LIST) {
                 clickListener = new View.OnClickListener() {
@@ -122,24 +150,27 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
                         }
                     }
                 };
-            } else {
-                clickListener = new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION) {
-                            PlaceItem placeItem = placeList.get(position);
-                            mFavoritesManager.removeFromFavorites(mContext, placeItem);
-                            placeList.remove(position);
-                            notifyItemRemoved(position);
-                            notifyItemMoved(position, placeList.size());
-
-                        }
-                    }
-                };
+                favoriteBtn.setOnClickListener(clickListener);
             }
 
-            favoriteBtn.setOnClickListener(clickListener);
+//            else {
+//                clickListener = new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        int position = getAdapterPosition();
+//                        if (position != RecyclerView.NO_POSITION) {
+//                            PlaceItem placeItem = placeList.get(position);
+//                            mFavoritesManager.removeFromFavorites(mContext, placeItem);
+//                            placeList.remove(position);
+//                            notifyItemRemoved(position);
+//                            notifyItemMoved(position, placeList.size());
+//
+//                        }
+//                    }
+//                };
+//            }
+
+
 
         }
     }
