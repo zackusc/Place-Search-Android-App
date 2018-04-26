@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class PhotosFragment extends Fragment{
+    private final static String TAG = "Map";
 
     private String placeId;
     protected GeoDataClient mGeoDataClient;
-    TextView mTextView;
     private Bitmap[] bitmaps;
     private int photoNum;
 
@@ -40,7 +40,8 @@ public class PhotosFragment extends Fragment{
 
     private int check;
 
-    ImageView sampleImage;
+    private boolean allDownloaded;
+
 
     public PhotosFragment() {
     }
@@ -53,34 +54,43 @@ public class PhotosFragment extends Fragment{
         return fragment;
     }
 
-
-
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        placeId = getArguments().getString("place_id");
+        Log.d("photos", "onCreate placeId: " + placeId);
+        mGeoDataClient = Places.getGeoDataClient(getActivity());
+        photoAdapter = new PhotoAdapter(new ArrayList<Bitmap>());
+        getPhotos();
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_photos, container, false);
-        placeId = getArguments().getString("place_id");
-        Log.d("photos", "onCreate placeId: " + placeId);
+//        placeId = getArguments().getString("place_id");
+//        Log.d("photos", "onCreate placeId: " + placeId);
+//        mGeoDataClient = Places.getGeoDataClient(getActivity());
 
-//        mTextView = rootView.findViewById(R.id.textView2);
-//        sampleImage = rootView.findViewById(R.id.imageView2);
-
-        mGeoDataClient = Places.getGeoDataClient(getActivity());
+//        if (getArguments() != null) {
+//            ArrayList<Bitmap> photos = getArguments().getParcelableArrayList("photos");
+//        }
 
         photosRecyclerView = rootView.findViewById(R.id.photos_recyclerView);
         photosRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        photoAdapter = new PhotoAdapter(new ArrayList<Bitmap>());
+        if(allDownloaded) {
+            photoAdapter = new PhotoAdapter(new ArrayList<Bitmap>(Arrays.asList(bitmaps)));
+        } else {
+            photoAdapter = new PhotoAdapter(new ArrayList<Bitmap>());
+        }
         photosRecyclerView.setAdapter(photoAdapter);
-        getPhotos();
-
+//        getPhotos();
         return rootView;
     }
 
 
     private void getPhotos() {
         final Task<PlacePhotoMetadataResponse> photoMetadataResponse = mGeoDataClient.getPlacePhotos(placeId);
-
         photoMetadataResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoMetadataResponse>() {
             @Override
             public void onComplete(@NonNull Task<PlacePhotoMetadataResponse> task) {
@@ -122,14 +132,7 @@ public class PhotosFragment extends Fragment{
                 Log.d("photos", "check=" + check);
 
                 if(check == photoNum) {
-
-                    boolean allDownloaded = true;
-
-
-
-                    ArrayList<Bitmap> photos = new ArrayList<>(Arrays.asList(bitmaps));
-//                    Log.d("photos", "arraylist size: " + photos.size());
-
+                    allDownloaded = true;
                     for(int k = 0; k < photoNum; k++) {
                         if(bitmaps[k] == null) {
                             allDownloaded = false;
@@ -139,9 +142,13 @@ public class PhotosFragment extends Fragment{
                         Log.d("photos", "all photos are downloaded");
                     }
 
-
-                    photoAdapter = new PhotoAdapter(new ArrayList<>(Arrays.asList(bitmaps)));
-                    photosRecyclerView.setAdapter(photoAdapter);
+                    ArrayList<Bitmap> photos = new ArrayList<>(Arrays.asList(bitmaps));
+                    photoAdapter = new PhotoAdapter(photos);
+                    if (photosRecyclerView != null) {
+                        photosRecyclerView.setAdapter(photoAdapter);
+                    } else {
+                        Log.e(TAG, "recyclerReview is not initialized!");
+                    }
                     photoMetadataBuffer.release();
                 }
             }
