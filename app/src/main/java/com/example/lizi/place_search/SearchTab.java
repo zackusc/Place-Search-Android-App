@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -183,6 +185,18 @@ public class SearchTab extends Fragment {
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ConnectivityManager cm =
+                        (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
+
+                if (!isConnected) {
+                    Toast.makeText(getActivity(), "Not network connection, try again later", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if (validateInputs()) {
                     String keyword = keywordET.getText().toString();
                     Log.d("search", "keyword: " + keyword);

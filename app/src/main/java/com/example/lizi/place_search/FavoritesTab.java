@@ -2,6 +2,8 @@ package com.example.lizi.place_search;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -56,6 +59,18 @@ public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickLi
 
     @Override
     public void onItemClick(int position) {
+        ConnectivityManager cm =
+                (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        if (!isConnected) {
+            Toast.makeText(getActivity(), "Not network connection, try again later", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent detailsIntent = new Intent(getActivity(), DetailsActivity.class);
         PlaceItem placeItem = favoritesList.get(position);
         String placeId = placeItem.getPlaceId();

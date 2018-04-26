@@ -88,7 +88,7 @@ public class PhotosFragment extends Fragment{
 
         if (photoAdapter.getItemCount() == 0) {
             noPhotosMessage.setVisibility(View.VISIBLE);
-            Log.e(TAG, "No photos set onCreateView");
+            Log.d(TAG, "No photos set onCreateView");
         }
         return rootView;
     }
@@ -129,6 +129,7 @@ public class PhotosFragment extends Fragment{
         });
     }
 
+    //TODO: each time a photo is downloaded, update the recyclerView
     private void getPhoto(int num) {
         PlacePhotoMetadata photoMetadata = photoMetadataBuffer.get(num);
         CharSequence attribution = photoMetadata.getAttributions();

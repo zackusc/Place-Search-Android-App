@@ -1,7 +1,10 @@
 package com.example.lizi.place_search;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
@@ -212,6 +216,18 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
 
     @Override
     public void onItemClick(int position) {
+        ConnectivityManager cm =
+                (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        if (!isConnected) {
+            Toast.makeText(this, "Not network connection, try again later", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent detailsIntent = new Intent(this, DetailsActivity.class);
         PlaceItem placeItem = resultsList.get(position);
         String placeId = placeItem.getPlaceId();
