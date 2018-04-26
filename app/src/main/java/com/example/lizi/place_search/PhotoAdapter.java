@@ -32,7 +32,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         Bitmap photo = photoList.get(position);
         holder.photoView.setImageBitmap(photo);
     }
-
     @Override
     public int getItemCount() {
         return photoList.size();
