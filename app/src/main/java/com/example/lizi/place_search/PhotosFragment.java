@@ -39,7 +39,6 @@ public class PhotosFragment extends Fragment{
     private PhotoAdapter photoAdapter;
 
     private int check;
-
     private boolean allDownloaded;
 
 

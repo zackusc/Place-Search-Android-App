@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.places.AutocompletePrediction;
@@ -65,6 +66,11 @@ public class SearchTab extends Fragment {
     Spinner spinnerCategories;
     EditText distanceET;
     AutoCompleteTextView addressET;
+    private TextView errorTextKeyword;
+    private TextView errorTextAddress;
+    private Button clearBtn;
+
+
     private PlaceAutocompleteAdapter mPlaceAutocompleteAdapter;
     protected GeoDataClient mGeoDataClient;
 
@@ -78,7 +84,6 @@ public class SearchTab extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.search_tab, container, false);
 
-
         keywordET = (EditText) view.findViewById(R.id.keyword);
         distanceET = (EditText) view.findViewById(R.id.distance);
         addressET = (AutoCompleteTextView) view.findViewById(R.id.inputAddress);
@@ -88,6 +93,8 @@ public class SearchTab extends Fragment {
                 android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategories.setAdapter(adapter);
+        errorTextAddress = view.findViewById(R.id.address_error_message);
+        errorTextKeyword = view.findViewById(R.id.keyword_error_message);
 
         mGeoDataClient = Places.getGeoDataClient(getActivity());
         mPlaceAutocompleteAdapter = new PlaceAutocompleteAdapter(getActivity(), mGeoDataClient, LAT_LNG_BOUNDS, null);
@@ -97,7 +104,21 @@ public class SearchTab extends Fragment {
         addListenerOnRadioButtons();
         addListenerOnSearchButton(view);
 
+        clearBtn = view.findViewById(R.id.buttonClear);
+        clearBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearForm();
+            }
+        });
+
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        clearForm();
     }
 
     private void getCurrentLocation() {
@@ -162,31 +183,35 @@ public class SearchTab extends Fragment {
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String keyword = keywordET.getText().toString();
-                Log.d("search", "keyword: " + keyword);
-                String category = String.valueOf(spinnerCategories.getSelectedItem());
-                Log.d("search", "category: " + category);
-                String distance = distanceET.getText().toString();
-                distance = distance.isEmpty() ? "10" : distance;
-                Log.d("search", "distance: " + distance);
+                if (validateInputs()) {
+                    String keyword = keywordET.getText().toString();
+                    Log.d("search", "keyword: " + keyword);
+                    String category = String.valueOf(spinnerCategories.getSelectedItem());
+                    Log.d("search", "category: " + category);
+                    String distance = distanceET.getText().toString();
+                    distance = distance.isEmpty() ? "10" : distance;
+                    Log.d("search", "distance: " + distance);
 
 
-                RequestParams params = new RequestParams();
-                params.put("keyword", keyword);
-                params.put("distance", distance);
-                params.put("category", category);
+                    RequestParams params = new RequestParams();
+                    params.put("keyword", keyword);
+                    params.put("distance", distance);
+                    params.put("category", category);
 
-                String address;
-                if(radioLocationGroup.getCheckedRadioButtonId() == R.id.radioOtherLocation) {
-                    address = addressET.getText().toString();
-                    Log.d("search", "address: " + address);
-                    params.put("address", address);
-                } else {
-                    params.put("lat", currentLat);
-                    params.put("lng", currentLon);
-                }
+                    String address;
+                    if(radioLocationGroup.getCheckedRadioButtonId() == R.id.radioOtherLocation) {
+                        address = addressET.getText().toString();
+                        Log.d("search", "address: " + address);
+                        params.put("address", address);
+                    } else {
+                        params.put("lat", currentLat);
+                        params.put("lng", currentLon);
+                    }
 //                Log.d("search", "params: " + params.toString());
-                getResultsAndSwitchView(params);
+                    getResultsAndSwitchView(params);
+                } else {
+                    Toast.makeText(getActivity(), "Please fix all fields with errors", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
@@ -235,6 +260,34 @@ public class SearchTab extends Fragment {
             }
         });
 
+    }
+
+    private boolean validateInputs() {
+        boolean isValid = true;
+        String keyword = keywordET.getText().toString();
+        if (keyword.trim().isEmpty()) {
+            isValid = false;
+            errorTextKeyword.setVisibility(View.VISIBLE);
+        }
+        if (radioLocationGroup.getCheckedRadioButtonId() == R.id.radioOtherLocation) {
+            String address = addressET.getText().toString();
+            Log.d("form validation", "input address: " + address);
+            if (address.trim().isEmpty()) {
+                isValid = false;
+                errorTextAddress.setVisibility(View.VISIBLE);
+            }
+        }
+        return isValid;
+    }
+
+    private void clearForm() {
+        errorTextAddress.setVisibility(View.GONE);
+        errorTextKeyword.setVisibility(View.GONE);
+        keywordET.setText("");
+        spinnerCategories.setSelection(0);
+        distanceET.setText("");
+        radioLocationGroup.check(R.id.radioCurrentLocation);
+        addressET.setText("");
     }
 
 

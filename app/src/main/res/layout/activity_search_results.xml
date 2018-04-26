@@ -24,6 +24,14 @@
         android:layout_below="@+id/toolbarResults"
         android:layout_above="@+id/paginationButtons"/>
 
+    <TextView
+        android:id="@+id/no_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="No results"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:id="@+id/paginationButtons"
         android:layout_width="match_parent"

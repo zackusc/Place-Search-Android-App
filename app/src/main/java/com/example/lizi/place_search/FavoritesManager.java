@@ -28,14 +28,14 @@ public class FavoritesManager {
         if (sharedPref.contains(placeId)) {
             editor.remove(placeId);
             favoBtn.setImageResource(R.drawable.heart_outline_black);
-            String text = place.getName() + "was removed from favorites";
+            String text = place.getName() + " was removed from favorites";
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
         } else {
             FavoritePlaceItem favoritePlace = new FavoritePlaceItem(place);
             String json = mGson.toJson(favoritePlace);
             editor.putString(placeId, json);
             favoBtn.setImageResource(R.drawable.heart_fill_red);
-            String text = place.getName() + "was added to favorites";
+            String text = place.getName() + " was added to favorites";
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
         }
         editor.apply();

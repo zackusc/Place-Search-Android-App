@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -21,6 +22,7 @@ public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickLi
     private FavoritesManager mFavoritesManager;
     private PlaceAdapter mAdapter;
     private ArrayList<PlaceItem> favoritesList;
+    private TextView noFavorites;
 
     @Nullable
     @Override
@@ -28,6 +30,7 @@ public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickLi
         View view = inflater.inflate(R.layout.favorites_tab, container, false);
         favoritesRecyclerView = view.findViewById(R.id.favorites_recyclerView);
         mFavoritesManager = new FavoritesManager();
+        noFavorites = view.findViewById(R.id.no_favorites);
         return view;
     }
 
@@ -36,6 +39,11 @@ public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickLi
         super.onResume();
         favoritesList = new ArrayList<>();
         ArrayList<FavoritePlaceItem> favorites = mFavoritesManager.getAllFavoritePlaces(getActivity());
+        if (favorites.size() == 0) {
+            noFavorites.setVisibility(View.VISIBLE);
+            return;
+        }
+        noFavorites.setVisibility(View.GONE);
         favoritesList.addAll(favorites);
         mAdapter = new PlaceAdapter(getActivity(), favoritesList, PlaceAdapter.FAVORITES_LIST);
         mAdapter.setOnItemClickListener(this);

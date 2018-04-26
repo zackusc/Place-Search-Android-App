@@ -115,6 +115,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.PlaceViewHol
                     @Override
                     public void onClick(View v) {
                         int position = getAdapterPosition();
+                        Log.d("On click favoBtn", "position:" + position);
                         if (position != RecyclerView.NO_POSITION) {
                             PlaceItem placeItem = placeList.get(position);
                             mFavoritesManager.onResultsFavoriteButtonClick(mContext, placeItem, favoriteBtn);

@@ -15,6 +15,14 @@
         android:layout_height="wrap_content"
         android:text="@string/keywordInputLabel" />
 
+    <TextView
+        android:id="@+id/keyword_error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please enter mandatory field"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="gone"/>
+
     <EditText
         android:id="@+id/keyword"
         android:layout_width="match_parent"
@@ -75,6 +83,14 @@
             android:layout_weight="1"
             android:text="@string/radio_other"/>
     </RadioGroup>
+
+    <TextView
+        android:id="@+id/address_error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please enter mandatory field"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="gone"/>
 
     <AutoCompleteTextView
         android:id="@+id/inputAddress"

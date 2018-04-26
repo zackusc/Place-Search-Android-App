@@ -76,14 +76,21 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
     }
 
     private void parseJSON(JSONObject jsonObj) throws JSONException{
+        JSONArray resultsJsonArray =  jsonObj.getJSONArray("results");
+
+        if (resultsJsonArray.length() == 0) {
+            findViewById(R.id.no_result).setVisibility(View.VISIBLE);
+            findViewById(R.id.paginationButtons).setVisibility(View.GONE);
+            return;
+        }
+
+
         if(jsonObj.has("next_page_token")) {
             nextPageToken = jsonObj.getString("next_page_token");
         } else {
             nextPageBtn.setEnabled(false);
             maxPageNum = currentPageNum;
         }
-
-        JSONArray resultsJsonArray =  jsonObj.getJSONArray("results");
 
         resultsList.clear();
 
