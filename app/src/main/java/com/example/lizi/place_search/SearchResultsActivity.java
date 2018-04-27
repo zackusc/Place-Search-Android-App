@@ -78,7 +78,9 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
     @Override
     protected void onResume() {
         super.onResume();
-        placeAdapter.notifyDataSetChanged();
+        if (placeAdapter != null) {
+            placeAdapter.notifyDataSetChanged();
+        }
     }
 
     private void parseJSON(JSONObject jsonObj) throws JSONException{

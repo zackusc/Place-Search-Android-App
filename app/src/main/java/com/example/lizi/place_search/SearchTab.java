@@ -271,6 +271,7 @@ public class SearchTab extends Fragment {
             public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
                 Log.d("search", "Fail " + e.toString());
                 Log.d("search", "Status code " + statusCode);
+                progressDialog.dismiss();
             }
         });
 
