@@ -38,14 +38,14 @@ public class FavoritesManager {
             String text = place.getName() + " was added to favorites";
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
         }
-        editor.apply();
+        editor.commit();
     }
 
     public void removeFromFavorites(Context context, PlaceItem placeItem) {
         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.remove(placeItem.getPlaceId());
-        editor.apply();
+        editor.commit();
         String text = placeItem.getName() + " was removed from favorites";
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
@@ -58,7 +58,7 @@ public class FavoritesManager {
         FavoritePlaceItem favoritePlace = new FavoritePlaceItem(place);
         String json = mGson.toJson(favoritePlace);
         editor.putString(placeId, json);
-        editor.apply();
+        editor.commit();
         String text = place.getName() + " was added to favorites";
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }

@@ -44,14 +44,21 @@ public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickLi
         super.onResume();
         favoritesList = new ArrayList<>();
         ArrayList<FavoritePlaceItem> favorites = mFavoritesManager.getAllFavoritePlaces(getActivity());
-        if (favorites.size() == 0) {
-            noFavorites.setVisibility(View.VISIBLE);
-            Log.d(TAG, "noavorites set visible in onResume");
-            return;
-        }
-        noFavorites.setVisibility(View.GONE);
         favoritesList.addAll(favorites);
         mAdapter = new PlaceAdapter(getActivity(), favoritesList, PlaceAdapter.FAVORITES_LIST);
+
+        if (favorites.size() == 0) {
+            noFavorites.setVisibility(View.VISIBLE);
+            Log.d(TAG, "noFavorites set visible in onResume");
+//            if (mAdapter != null) {
+//                favoritesRecyclerView.setAdapter(mAdapter);
+//                Log.d(TAG, "mAdapter get item count:" + mAdapter.getItemCount());
+//            }
+//            return;
+        } else {
+            noFavorites.setVisibility(View.GONE);
+        }
+
         mAdapter.setOnItemClickListener(this);
         mAdapter.setOnFavoriteButtonClickListener(this);
         favoritesRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity()));
