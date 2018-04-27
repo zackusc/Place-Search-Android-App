@@ -31,6 +31,7 @@ import cz.msebera.android.httpclient.Header;
 
 public class SearchResultsActivity extends AppCompatActivity implements PlaceAdapter.OnItemClickListener{
     final String NEXT_PAGE_URL = "http://place-search-lizi0829.us-east-2.elasticbeanstalk.com/results/nextpage";
+    private final static String TAG = "results";
     private RecyclerView resultsRecyclerView;
     private ArrayList<PlaceItem> resultsList;
     private PlaceAdapter placeAdapter;
@@ -49,25 +50,21 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_results);
 
+        resultsList = new ArrayList<>();
+        Intent mIntent = getIntent();
+        String resultsJSON = mIntent.getStringExtra("resultsJSON");
+        Log.d("results ", "onCreate: received results JSON: " + resultsJSON);
+
+
         mToolbar =  (Toolbar) findViewById(R.id.toolbarResults);
         setSupportActionBar(mToolbar);
         addListenerOnNavigation();
         addListenerOnButtonNextPage();
         addListenerOnButtonPrevPage();
 
-        resultsList = new ArrayList<>();
         resultsRecyclerView = findViewById(R.id.results_RecyclerView);
         resultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         pages = new ArrayList<>();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        Intent mIntent = getIntent();
-        String resultsJSON = mIntent.getStringExtra("resultsJSON");
-        Log.d("results", "received results JSON: " + resultsJSON);
 
         try {
             JSONObject resultsJsonObj = new JSONObject(resultsJSON);
@@ -76,8 +73,25 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
             Log.e("results", "could not parse JSON");
             e.printStackTrace();
         }
-
     }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//
+//        Intent mIntent = getIntent();
+//        String resultsJSON = mIntent.getStringExtra("resultsJSON");
+//        Log.d("results ", "onCreate: received results JSON: " + resultsJSON);
+//
+//        try {
+//            JSONObject resultsJsonObj = new JSONObject(resultsJSON);
+//            parseJSON(resultsJsonObj);
+//        } catch (JSONException e) {
+//            Log.e("results", "could not parse JSON");
+//            e.printStackTrace();
+//        }
+//
+//    }
 
     private void parseJSON(JSONObject jsonObj) throws JSONException{
         JSONArray resultsJsonArray =  jsonObj.getJSONArray("results");
