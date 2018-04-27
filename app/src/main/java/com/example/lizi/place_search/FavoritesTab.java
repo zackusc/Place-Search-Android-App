@@ -46,6 +46,7 @@ public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickLi
         ArrayList<FavoritePlaceItem> favorites = mFavoritesManager.getAllFavoritePlaces(getActivity());
         if (favorites.size() == 0) {
             noFavorites.setVisibility(View.VISIBLE);
+            Log.d(TAG, "noavorites set visible in onResume");
             return;
         }
         noFavorites.setVisibility(View.GONE);
@@ -93,6 +94,7 @@ public class FavoritesTab extends Fragment implements PlaceAdapter.OnItemClickLi
         if (mAdapter.getItemCount() == 0) {
 //        if (favoritesList.size() == 0) { //this check is also doable
             noFavorites.setVisibility(View.VISIBLE);
+            Log.d(TAG, "noFavorites set visible in onFavoriteButtonClick");
         }
     }
 

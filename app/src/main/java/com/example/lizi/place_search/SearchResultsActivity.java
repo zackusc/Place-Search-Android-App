@@ -75,23 +75,11 @@ public class SearchResultsActivity extends AppCompatActivity implements PlaceAda
         }
     }
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//
-//        Intent mIntent = getIntent();
-//        String resultsJSON = mIntent.getStringExtra("resultsJSON");
-//        Log.d("results ", "onCreate: received results JSON: " + resultsJSON);
-//
-//        try {
-//            JSONObject resultsJsonObj = new JSONObject(resultsJSON);
-//            parseJSON(resultsJsonObj);
-//        } catch (JSONException e) {
-//            Log.e("results", "could not parse JSON");
-//            e.printStackTrace();
-//        }
-//
-//    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        placeAdapter.notifyDataSetChanged();
+    }
 
     private void parseJSON(JSONObject jsonObj) throws JSONException{
         JSONArray resultsJsonArray =  jsonObj.getJSONArray("results");
